@@ -4,14 +4,14 @@ using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Logic.Pieces
 {
-	public class Miner : IPiece
+	public class Catapult : IPiece
 	{
-		public string Name => "Miner";
-		public int ScoreValue => 4;
+		public string Name => "Catapult";
+		public int ScoreValue => 6;
 		public ETeam Team { get; set; }
-		public EPieceType PieceType => EPieceType.Miner;
+		public EPieceType PieceType => EPieceType.Catapult;
 
-		public Miner(ETeam team)
+		public Catapult(ETeam team)
 		{
 			Team = team;
 		}

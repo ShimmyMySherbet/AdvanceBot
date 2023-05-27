@@ -4,17 +4,12 @@ using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Logic.Pieces
 {
-	public class Miner : IPiece
+	public class Wall : IPiece
 	{
-		public string Name => "Miner";
-		public int ScoreValue => 4;
+		public string Name => "Wall";
+		public int ScoreValue => 0;
 		public ETeam Team { get; set; }
-		public EPieceType PieceType => EPieceType.Miner;
-
-		public Miner(ETeam team)
-		{
-			Team = team;
-		}
+		public EPieceType PieceType => EPieceType.Wall;
 
 		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map)
 		{

@@ -13,4 +13,8 @@
     <Folder Include="RawAssets\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AdvanceEngine\AdvanceEngine.csproj" />
+  </ItemGroup>
+
 </Project>

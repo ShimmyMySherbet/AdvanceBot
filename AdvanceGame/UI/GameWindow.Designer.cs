@@ -28,12 +28,34 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
+			this.pngRender = new System.Windows.Forms.PictureBox();
+			((System.ComponentModel.ISupportInitialize)(this.pngRender)).BeginInit();
+			this.SuspendLayout();
+			// 
+			// pngRender
+			// 
+			this.pngRender.Location = new System.Drawing.Point(12, 23);
+			this.pngRender.Name = "pngRender";
+			this.pngRender.Size = new System.Drawing.Size(700, 700);
+			this.pngRender.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.pngRender.TabIndex = 0;
+			this.pngRender.TabStop = false;
+			// 
+			// GameWindow
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(800, 450);
+			this.ClientSize = new System.Drawing.Size(732, 741);
+			this.Controls.Add(this.pngRender);
+			this.Name = "GameWindow";
 			this.Text = "GameWindow";
+			((System.ComponentModel.ISupportInitialize)(this.pngRender)).EndInit();
+			this.ResumeLayout(false);
+
 		}
 
 		#endregion
+
+		private PictureBox pngRender;
 	}
 }

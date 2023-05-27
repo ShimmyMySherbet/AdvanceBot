@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AdvanceEngine.Models;
+using AdvanceEngine.Models.Attributes;
+using AdvanceEngine.Models.Enums;
 
 namespace AdvanceEngine.Logic.Pieces
 {
-	public class Builder
+	[AdvancePiece(value: 2, type: EPieceType.Builder)]
+	public class Builder : Piece
 	{
+		public Builder(ETeam team) : base(team)
+		{
+		}
 	}
 }

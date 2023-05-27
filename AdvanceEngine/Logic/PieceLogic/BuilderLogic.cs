@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdvanceEngine.Logic.Pieces
+namespace AdvanceEngine.Logic.PieceLogic
 {
-	public class Capapult
+	public class BuilderLogic
 	{
+
+
+
+
+
 	}
 }
