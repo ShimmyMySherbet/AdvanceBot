@@ -1,23 +1,28 @@
 ﻿using AdvanceEngine.Models;
+using AdvanceEngine.Models.Attributes;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Logic.Pieces
 {
-	public class Sentinel : IPiece
+	[AdvancePiece(value: 6, EPieceType.Sentinel)]
+	public class Sentinel : Piece
 	{
-		public string Name => "Sentinel";
-		public int ScoreValue => 5;
-		public ETeam Team { get; set; }
-		public EPieceType PieceType => EPieceType.Sentinel;
-		public Sentinel(ETeam team)
-		{
-			Team = team;
-		}
+		public Sentinel(ETeam team) : base(team) { }
 
-		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map)
+		public override IPiece Convert(ETeam team) => new Sentinel(team);
+
+		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, int dir)
 		{
-			yield break;
+			yield return new PotentialMove(x - 2, y - 1);
+			yield return new PotentialMove(x - 1, y - 2);
+			yield return new PotentialMove(x + 1, y - 2);
+			yield return new PotentialMove(x + 2, y - 1);
+
+			yield return new PotentialMove(x + 2, y + 1);
+			yield return new PotentialMove(x + 1, y + 2);
+			yield return new PotentialMove(x - 1, y + 2);
+			yield return new PotentialMove(x - 2, y + 1);
 		}
 	}
 }

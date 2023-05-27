@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AdvanceEngine.Models.Enums;
+﻿using AdvanceEngine.Models.Enums;
 
 namespace AdvanceEngine.Models.Interfaces
 {
@@ -20,6 +15,7 @@ namespace AdvanceEngine.Models.Interfaces
 		IPieceMap Mutate(Move move);
 
 		IPieceMap Mutate(MapMutator mutator);
-		
+
+		IPiece? CheckForDanger(int x, int y, ETeam team);
 	}
 }

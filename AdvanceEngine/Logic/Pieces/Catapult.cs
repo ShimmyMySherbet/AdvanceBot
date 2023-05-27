@@ -1,24 +1,33 @@
 ﻿using AdvanceEngine.Models;
+using AdvanceEngine.Models.Attributes;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Logic.Pieces
 {
-	public class Catapult : IPiece
+	[AdvancePiece(value: 6, type: EPieceType.Catapult)]
+	public class Catapult : Piece
 	{
-		public string Name => "Catapult";
-		public int ScoreValue => 6;
-		public ETeam Team { get; set; }
-		public EPieceType PieceType => EPieceType.Catapult;
+		public Catapult(ETeam team) : base(team) { }
 
-		public Catapult(ETeam team)
-		{
-			Team = team;
-		}
+		public override IPiece Convert(ETeam team) => new Catapult(team);
 
-		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map)
+		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, int dir)
 		{
-			yield break;
+			yield return new PotentialMove(x, y - 1, canAttack: false);
+			yield return new PotentialMove(x, y + 1, canAttack: false);
+			yield return new PotentialMove(x - 1, y, canAttack: false);
+			yield return new PotentialMove(x + 1, y, canAttack: false);
+
+			yield return new PotentialMove(x, y - 3, canMove: false, movesOnAttack: false);
+			yield return new PotentialMove(x, y + 3, canMove: false, movesOnAttack: false);
+			yield return new PotentialMove(x - 3, y, canMove: false, movesOnAttack: false);
+			yield return new PotentialMove(x + 3, y, canMove: false, movesOnAttack: false);
+
+			yield return new PotentialMove(x + 2, y + 2, canMove: false, movesOnAttack: false);
+			yield return new PotentialMove(x + 2, y - 2, canMove: false, movesOnAttack: false);
+			yield return new PotentialMove(x - 2, y + 2, canMove: false, movesOnAttack: false);
+			yield return new PotentialMove(x - 2, y - 2, canMove: false, movesOnAttack: false);
 		}
 	}
 }

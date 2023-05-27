@@ -6,6 +6,10 @@ namespace AdvanceEngine.Models
 {
 	public static class Mutators
 	{
+		/// <summary>
+		/// Board mutator to add initial pieces
+		/// </summary>
+		/// <param name="map">The board to mutate</param>
 		public static void DefaultLayout(IPiece?[,] map)
 		{
 			map[0, 0] = new Miner(ETeam.Black);
@@ -46,6 +50,19 @@ namespace AdvanceEngine.Models
 			map[7, 8] = new Jester(ETeam.White);
 			map[8, 8] = new Miner(ETeam.White);
 
+		}
+
+		/// <summary>
+		/// Configurable board mutator to add a single piece in the centre of the board.
+		/// Used for testing piece logic.
+		/// </summary>
+		/// <param name="map">The board to mutate</param>
+		public static MapMutator SinglePiece(IPiece piece)
+		{
+			return (IPiece?[,] map) =>
+			{
+				map[4, 4] = piece;
+			};
 		}
 	}
 }

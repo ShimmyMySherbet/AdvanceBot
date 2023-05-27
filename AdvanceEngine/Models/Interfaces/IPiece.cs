@@ -11,6 +11,10 @@ namespace AdvanceEngine.Models.Interfaces
 
 		public EPieceType PieceType { get; }
 
-		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map);
+		public bool Convertable { get; }
+
+		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map, int filterX = -1, int filyerY = -1);
+
+		public IPiece Convert(ETeam team);
 	}
 }

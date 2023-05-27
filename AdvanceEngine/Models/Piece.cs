@@ -11,6 +11,7 @@ namespace AdvanceEngine.Models
 		public EPieceType PieceType { get; init; }
 
 		public ETeam Team { get; set; }
+		public bool Convertable { get; } = true;
 
 		/// <summary>
 		/// Constructor using <seealso cref="AdvancePieceAttribute"/> for metadata.
@@ -25,13 +26,14 @@ namespace AdvanceEngine.Models
 			}
 			ScoreValue = info.Value;
 			PieceType = info.Type;
+			Convertable = info.Convertable;
 		}
 
 		/// <summary>
 		/// Proxy constructor for <see cref="Piece.Piece"/>
 		/// </summary>
 		/// <param name="team">The team the piece is assigned to</param>
-		public Piece(ETeam team) : base()
+		public Piece(ETeam team) : this()
 		{
 			Team = team;
 		}
@@ -49,9 +51,6 @@ namespace AdvanceEngine.Models
 			Team = team;
 		}
 
-		public virtual IEnumerator<Move> GetMoves(int x, int y, IPieceMap map)
-		{
-			yield break;
-		}
+		public abstract IPiece Convert(ETeam team);
 	}
 }

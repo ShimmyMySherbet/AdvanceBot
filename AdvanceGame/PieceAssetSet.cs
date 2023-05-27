@@ -6,10 +6,13 @@ namespace AdvanceGame
 	{
 		public Dictionary<(EPieceType type, ETeam team), Image> Assets { get; } = new();
 
+
+
 		public Image? Move { get; set; }
 		public Image? Attack { get; set; }
 		public Image? Build { get; set; }
 		public Image? Protect { get; set; }
+		public Image? Convert { get; set; }
 
 		public static PieceAssetSet FromFolder(string folder)
 		{
@@ -44,6 +47,9 @@ namespace AdvanceGame
 						break;
 					case "move":
 						set.Move = Image.FromFile(file);
+						break;
+					case "convert":
+						set.Convert = Image.FromFile(file);
 						break;
 				}
 			}

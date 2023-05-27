@@ -1,4 +1,5 @@
 ﻿using AdvanceEngine.Logic;
+using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
 
@@ -51,6 +52,20 @@ namespace AdvanceEngine.Models
 
 		public bool IsProtected(int x, int y, ETeam attacker)
 		{
+
+			var positions = new (int x, int y)[] { (-1, 0), (1, 0), (0, -1), (0, 1) };
+
+			foreach (var p in positions)
+			{
+				if (IsValidCoordinate(x + p.x, y + p.y))
+				{
+					var piece = GetPieceAtPosition(x + p.x, y + p.y);
+					if (piece != null && piece.Team != attacker && piece is Sentinel)
+					{
+						return true;
+					}
+				}
+			}
 			return false;
 		}
 
@@ -64,6 +79,32 @@ namespace AdvanceEngine.Models
 			mutator(newMap);
 
 			return new PieceMap(newMap);
+		}
+
+		public IPiece? CheckForDanger(int x, int y, ETeam team)
+		{
+			var attacker = team == ETeam.White ? ETeam.Black : ETeam.White;
+
+			for (int px = 0; px < 9; px++)
+			{
+				for (int py = 0; py < 9; py++)
+				{
+					var piece = GetPieceAtPosition(px, py);
+
+					if (piece != null && piece.Team == attacker)
+					{
+						using(var moves = piece.GetMoves(px, py, this, x, y))
+						{
+							while(moves.MoveNext())
+							{
+								return piece;
+							}
+						}
+					}
+				}
+			}
+
+			return null;
 		}
 	}
 }

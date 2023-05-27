@@ -1,24 +1,30 @@
 ﻿using AdvanceEngine.Models;
+using AdvanceEngine.Models.Attributes;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Logic.Pieces
 {
-	public class Jester : IPiece
+	[AdvancePiece(value: 3, type: EPieceType.Jester)]
+	public class Jester : Piece
 	{
-		public string Name => "Jester";
-		public int ScoreValue => 3;
-		public ETeam Team { get; set; }
-		public EPieceType PieceType => EPieceType.Jester;
+		public Jester(ETeam team) : base(team) { }
 
-		public Jester(ETeam team)
-		{
-			Team = team;
-		}
+		public override IPiece Convert(ETeam team) => new Jester(team);
 
-		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map)
+		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, int dir)
 		{
-			yield break;
+			for (int offsetX = -1; offsetX < 2; offsetX++)
+			{
+				for (int offsetY = -1; offsetY < 2; offsetY++)
+				{
+					if (offsetX == 0 && offsetY == 0)
+						continue;
+
+					yield return new PotentialMove(x + offsetX, y + offsetY, canMove: false, convertsEnemy: true);
+					yield return new PotentialMove(x + offsetX, y + offsetY, canAttack: false, swapsPlaces: true);
+				}
+			}
 		}
 	}
 }

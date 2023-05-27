@@ -14,16 +14,17 @@ namespace AdvanceEngine.Models
 
 		public (int x, int y)? TargetPosition { get; set; }
 
-		public bool IsAttack { get; set; }
+		public EMoveType MoveType { get; }
 		public (int x, int y) Origin { get; set; }
 
 		public MapMutator Mutator { get; }
 
-		public Move(float scoreChange, int enemyScoreChange, MapMutator mutator)
+		public Move(float scoreChange, int enemyScoreChange, MapMutator mutator, EMoveType type)
 		{
 			OwnScoreChange = scoreChange;
 			EnemyScoreChange = enemyScoreChange;
 			Mutator = mutator;
+			MoveType = type;
 		}
 	}
 }

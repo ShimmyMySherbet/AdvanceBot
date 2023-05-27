@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Xml.XPath;
+using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
+using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceGame.UI
@@ -17,6 +20,7 @@ namespace AdvanceGame.UI
 			var subMap = new IPiece?[9, 9];
 			Map = PieceMap.Default.Mutate(Mutators.DefaultLayout);
 
+
 			var set = PieceAssetSet.FromFolder("assets");
 			m_Renderer = new BoardRenderer(set);
 
@@ -27,6 +31,7 @@ namespace AdvanceGame.UI
 
 		private void PngRender_MouseClick(object? sender, MouseEventArgs e)
 		{
+
 			Debug.WriteLine($"x: {e.X}, Y: {e.Y}");
 			var xPerc = e.X / (float)pngRender.Width;
 			var yPerc = e.Y / (float)pngRender.Height;
@@ -41,7 +46,17 @@ namespace AdvanceGame.UI
 
 
 
-			var move = m_Renderer.CurrentMoves.FirstOrDefault(x => (x.TargetPosition?.x ?? -1) == sqX && (x.TargetPosition?.y ?? -1) == sqY);
+			var moves = m_Renderer.CurrentMoves.Where(x => (x.TargetPosition?.x ?? -1) == sqX && (x.TargetPosition?.y ?? -1) == sqY).ToArray();
+
+			var move = moves.FirstOrDefault();
+
+
+			if (moves.Length > 1 && e.Button == MouseButtons.Right)
+			{
+				move = moves[1];
+			}
+
+
 
 			if (move != null)
 			{

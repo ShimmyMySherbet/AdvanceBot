@@ -1,5 +1,6 @@
 ﻿using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
+using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceGame
@@ -40,12 +41,10 @@ namespace AdvanceGame
 
 						g.FillRectangle(brush, rect);
 
-
 						if (x == SelectedPiece.x && y == SelectedPiece.y)
 						{
 							g.FillRectangle(Brushes.Blue, rect);
 						}
-
 
 						var piece = map.GetPieceAtPosition(x, y);
 						if (piece != null)
@@ -81,31 +80,36 @@ namespace AdvanceGame
 									var rect = new RectangleF(targetX, targetY, blockSize, blockSize);
 
 									Image? icon = null;
-									if (move.IsAttack)
+									switch (move.MoveType)
 									{
-										icon = Set.Attack;
-									}
-									else
-									{
-										icon = Set.Move;
+										case EMoveType.Move:
+											icon = Set.Move;
+											break;
+										case EMoveType.Attack:
+											icon = Set.Attack;
+											break;
+										case EMoveType.Build:
+											icon = Set.Build;
+											break;
+										case EMoveType.Convert:
+											icon = Set.Convert;
+											break;
 									}
 
 									if (icon != null)
 										g.DrawImage(icon, rect);
 
-
 									CurrentMoves.Add(move);
 								}
 							}
 						}
-
 					}
 
 					if (highlightTarget is Sentinel)
 					{
 						var positions = new (int x, int y)[] { (SelectedPiece.x - 1, SelectedPiece.y), (SelectedPiece.x + 1, SelectedPiece.y), (SelectedPiece.x, SelectedPiece.y - 1), (SelectedPiece.x, SelectedPiece.y + 1) };
 
-						foreach(var p in positions)
+						foreach (var p in positions)
 						{
 							if (map.IsValidCoordinate(p.x, p.y))
 							{
@@ -118,18 +122,11 @@ namespace AdvanceGame
 									{
 										g.DrawImage(Set.Protect, rect);
 									}
-
-
 								}
 							}
 						}
-
-
 					}
-
-
 				}
-
 
 				g.Save();
 			}

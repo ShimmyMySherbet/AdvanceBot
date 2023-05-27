@@ -1,24 +1,29 @@
 ﻿using AdvanceEngine.Models;
+using AdvanceEngine.Models.Attributes;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Logic.Pieces
 {
-	public class General : IPiece
+	[AdvancePiece(value: 0, EPieceType.General, convertable: false)]
+	public class General : Piece
 	{
-		public string Name => "General";
-		public int ScoreValue => 999999;
-		public ETeam Team { get; set; }
-		public EPieceType PieceType => EPieceType.General;
+		public General(ETeam team) : base(team) { }
 
-		public General(ETeam team)
-		{
-			Team = team;
-		}
+		public override IPiece Convert(ETeam team) => this;
 
-		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map)
+		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, int dir)
 		{
-			yield break;
+			for (int offsetX = -1; offsetX < 2; offsetX++)
+			{
+				for (int offsetY = -1; offsetY < 2; offsetY++)
+				{
+					if (offsetX == x && offsetY == y)
+						continue;
+
+					yield return new PotentialMove(x + offsetX, y + offsetY, mustNotBeCaptured: true);
+				}
+			}
 		}
 	}
 }
