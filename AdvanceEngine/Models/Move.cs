@@ -1,4 +1,5 @@
 ﻿using AdvanceEngine.Models.Enums;
+using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Models
 {
@@ -7,10 +8,12 @@ namespace AdvanceEngine.Models
 	/// </summary>
 	public class Move
 	{
+		public float ScoreChange => OwnScoreChange - EnemyScoreChange;
 		public float EnemyScoreChange { get; }
 		public float OwnScoreChange { get; }
 
 		public EPieceType? TargetPiece { get; set; }
+		public IPiece? Self { get; set; }
 
 		public (int x, int y)? TargetPosition { get; set; }
 
@@ -19,12 +22,13 @@ namespace AdvanceEngine.Models
 
 		public MapMutator Mutator { get; }
 
-		public Move(float scoreChange, int enemyScoreChange, MapMutator mutator, EMoveType type)
+		public Move(float scoreChange, int enemyScoreChange, MapMutator mutator, EMoveType type, IPiece? self)
 		{
 			OwnScoreChange = scoreChange;
 			EnemyScoreChange = enemyScoreChange;
 			Mutator = mutator;
 			MoveType = type;
+			Self = self;
 		}
 	}
 }

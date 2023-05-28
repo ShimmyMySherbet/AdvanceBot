@@ -64,7 +64,7 @@ namespace AdvanceEngine.Models
 								map[current.TargetX, current.TargetY] = self;
 								map[x, y] = target;
 							};
-							yield return new Move(0, 0, mutator, EMoveType.Move)
+							yield return new Move(0, 0, mutator, EMoveType.Move, self)
 							{
 								Origin = (x, y),
 								TargetPosition = (current.TargetX, current.TargetY),
@@ -139,7 +139,7 @@ namespace AdvanceEngine.Models
 							}
 						}
 
-						yield return new Move(0, -1, attackMutator, current.ConvertsEnemy ? EMoveType.Convert : EMoveType.Attack)
+						yield return new Move(0, -1, attackMutator, current.ConvertsEnemy ? EMoveType.Convert : EMoveType.Attack, self)
 						{
 							Origin = (x, y),
 							TargetPiece = target.PieceType,
@@ -174,7 +174,7 @@ namespace AdvanceEngine.Models
 						}
 
 
-						yield return new Move(0, 0, mutator, EMoveType.Build)
+						yield return new Move(0, 0, mutator, EMoveType.Build, self)
 						{
 							Origin = (x, y),
 							TargetPosition = (current.TargetX, current.TargetY)
@@ -208,7 +208,7 @@ namespace AdvanceEngine.Models
 					}
 
 
-					yield return new Move(0, 0, moveMutator, EMoveType.Move)
+					yield return new Move(0, 0, moveMutator, EMoveType.Move, self)
 					{
 						Origin = (x, y),
 						TargetPiece = null,

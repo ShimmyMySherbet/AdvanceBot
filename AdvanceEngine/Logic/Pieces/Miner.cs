@@ -30,44 +30,6 @@ namespace AdvanceEngine.Logic.Pieces
 					pos = (pos.x + slDir.x, pos.y + slDir.y);
 				}
 			}
-
-
-			//var check = new List<(int x, int y)>();
-			//for(int slidex = x -1; slidex >= 0; slidex--)
-			//{
-			//	yield return new PotentialMove(slidex, y, canBreakWalls: true, mustBeEmpty: check.ToArray());
-			//	check.Add((slidex, y));
-			//}
-			//check.Clear();
-
-
-			//for (int slidex = x + 1; slidex < 9; slidex++)
-			//{
-			//	yield return new PotentialMove(slidex, y, canBreakWalls: true, mustBeEmpty: check.ToArray());
-			//	check.Add((slidex, y));
-			//}
-			//check.Clear();
-
-
-
-
-			//for (int slidey = y - 1; slidey >= 0; slidey--)
-			//{
-			//	yield return new PotentialMove(x, slidey, canBreakWalls: true, mustBeEmpty: check.ToArray());
-			//	check.Add((x, slidey));
-			//}
-			//check.Clear();
-
-
-
-			//for (int slidey = y + 1; slidey < 9; slidey++)
-			//{
-			//	yield return new PotentialMove(x, slidey, canBreakWalls: true, mustBeEmpty: check.ToArray());
-			//	check.Add((x, slidey));
-			//}
-			//check.Clear();
-
-
 		}
 	}
 }

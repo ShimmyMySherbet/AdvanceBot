@@ -7,7 +7,7 @@ namespace AdvanceEngine.Models.Interfaces
 	{
 		public int ScoreValue { get; }
 
-		public ETeam Team { get; set; }
+		public ETeam Team { get; }
 
 		public EPieceType PieceType { get; }
 

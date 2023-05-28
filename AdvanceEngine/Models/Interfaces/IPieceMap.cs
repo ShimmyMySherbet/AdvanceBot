@@ -17,5 +17,9 @@ namespace AdvanceEngine.Models.Interfaces
 		IPieceMap Mutate(MapMutator mutator);
 
 		IPiece? CheckForDanger(int x, int y, ETeam team);
+
+		ECheckState CheckState(ETeam team);
+
+		BoardInfo GetBoardInfo(ETeam team);
 	}
 }

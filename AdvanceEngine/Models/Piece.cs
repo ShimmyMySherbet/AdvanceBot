@@ -7,10 +7,10 @@ namespace AdvanceEngine.Models
 {
 	public abstract partial class Piece : IPiece
 	{
-		public int ScoreValue { get; init; }
-		public EPieceType PieceType { get; init; }
+		public int ScoreValue { get; }
+		public EPieceType PieceType { get; }
 
-		public ETeam Team { get; set; }
+		public ETeam Team { get; }
 		public bool Convertable { get; } = true;
 
 		/// <summary>
