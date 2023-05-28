@@ -58,7 +58,7 @@
 			this.txtDescription.Multiline = true;
 			this.txtDescription.Name = "txtDescription";
 			this.txtDescription.ReadOnly = true;
-			this.txtDescription.Size = new System.Drawing.Size(702, 84);
+			this.txtDescription.Size = new System.Drawing.Size(702, 93);
 			this.txtDescription.TabIndex = 1;
 			this.txtDescription.TabStop = false;
 			this.txtDescription.Text = "Advance AI bot implemented to level 4 (Pass).\r\nSelects a random valid move each t" +
@@ -69,7 +69,7 @@
 			this.lblIntensity.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.lblIntensity.AutoSize = true;
 			this.lblIntensity.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.lblIntensity.Location = new System.Drawing.Point(24, 111);
+			this.lblIntensity.Location = new System.Drawing.Point(24, 120);
 			this.lblIntensity.Name = "lblIntensity";
 			this.lblIntensity.Size = new System.Drawing.Size(256, 25);
 			this.lblIntensity.TabIndex = 2;
@@ -80,7 +80,7 @@
 			this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.btnSelect.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.btnSelect.Location = new System.Drawing.Point(650, 108);
+			this.btnSelect.Location = new System.Drawing.Point(650, 117);
 			this.btnSelect.Name = "btnSelect";
 			this.btnSelect.Size = new System.Drawing.Size(77, 30);
 			this.btnSelect.TabIndex = 3;
@@ -98,7 +98,7 @@
 			this.Controls.Add(this.txtDescription);
 			this.Controls.Add(this.lblTitle);
 			this.Name = "AIModel";
-			this.Size = new System.Drawing.Size(730, 142);
+			this.Size = new System.Drawing.Size(730, 151);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

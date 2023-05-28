@@ -9,7 +9,6 @@ namespace AdvanceGame.UI
 	public partial class GameWindow : Form
 	{
 		private List<(IPieceMap board, ETeam team, int black, int white)> m_History = new();
-		private int m_HistoryHead = 0;
 
 		private BoardRenderer m_Renderer;
 
@@ -136,7 +135,7 @@ namespace AdvanceGame.UI
 				}
 				else if (whiteValue > blackValue)
 				{
-					winner = ETeam.Black;
+					winner = ETeam.White;
 				}
 				else
 				{
@@ -323,11 +322,19 @@ namespace AdvanceGame.UI
 		private void cbWhiteAI_CheckedChanged(object sender, EventArgs e)
 		{
 			WhiteAIEnabled = cbWhiteAI.Checked;
+			if (CurrentTeam == ETeam.White)
+			{
+				PromptForMove(CurrentTeam);
+			}
 		}
 
 		private void cbBlackAI_CheckedChanged(object sender, EventArgs e)
 		{
 			BlackAIEnabled = cbBlackAI.Checked;
+			if (CurrentTeam == ETeam.Black)
+			{
+				PromptForMove(CurrentTeam);
+			}
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -343,6 +350,20 @@ namespace AdvanceGame.UI
 			m_History.RemoveAt(m_History.Count - 1);
 			Render();
 			PromptForMove(CurrentTeam);
+		}
+
+		private void btnReset_Click(object sender, EventArgs e)
+		{
+			m_History.Add((Map, CurrentTeam, BlackMoves, WhiteMoves));
+			Map = PieceMap.Default
+				.Mutate(Mutators.DefaultLayout);
+			BlackMoves = 0;
+			WhiteMoves = 0;
+			CurrentTeam = ETeam.White;
+			lblWhiteMoves.Text = $"Moves: {WhiteMoves}";
+			lblBlackMoves.Text = $"Moves: {BlackMoves}";
+			lblTurn.Text = $"Current Turn: {CurrentTeam}";
+			Render();
 		}
 	}
 }

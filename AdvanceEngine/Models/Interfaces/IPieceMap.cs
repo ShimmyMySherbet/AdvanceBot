@@ -21,5 +21,8 @@ namespace AdvanceEngine.Models.Interfaces
 		ECheckState CheckState(ETeam team);
 
 		BoardInfo GetBoardInfo(ETeam team);
+
+		int GetTeamValue(ETeam team);
+		int GetTeamLead(ETeam team);
 	}
 }

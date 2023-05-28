@@ -14,78 +14,46 @@ namespace AdvanceEngine.AI
 
 		public Move? DetermineMove(IPieceMap pieceMap, ETeam team)
 		{
-			IPiece? selfGeneral = null;
-			(int x, int y) self = (0, 0);
-			var pieces = new List<(IPiece piece, int x, int y)>(18);
+			var info = pieceMap.GetBoardInfo(team);
 
-			for (int x = 0; x < 9; x++)
+			var threat = pieceMap.CheckForDanger(info.Self.X, info.Self.Y, team);
+			if (threat != null)
 			{
-				for (int y = 0; y < 9; y++)
-				{
-					var p = pieceMap.GetPieceAtPosition(x, y);
-					if (p != null && p.Team == team)
-					{
-						pieces.Add((p, x, y));
-						if (p is General)
-						{
-							selfGeneral = p;
-							self = (x, y);
-						}
-					}
-				}
-			}
-
-			if (selfGeneral != null)
-			{
-				var threat = pieceMap.CheckForDanger(self.x, self.y, team);
-
-				if (threat != null)
-				{
-					return DetermineMoveChecked(pieceMap, team, selfGeneral, self.x, self.y, pieces);
-				}
+				return DetermineMoveChecked(pieceMap, team, info);
 			}
 
 			var moveList = new List<Move>();
-			while (pieces.Count > 0)
+			foreach(var friendly in info.Friendly)
 			{
-				moveList.Clear();
-				var index = m_Random.Next(pieces.Count);
-				var piece = pieces[index];
-				var moves = piece.piece.GetMoves(piece.x, piece.y, pieceMap);
-
-				using (moves)
+				using (var moves = friendly.Piece.GetMoves(friendly.X, friendly.Y, pieceMap))
 				{
-					while (moves.MoveNext())
+					while(moves.MoveNext())
 					{
 						moveList.Add(moves.Current);
 					}
 				}
+			}
 
-				if (moveList.Count == 0)
-				{
-					continue;
-				}
-
-				var moveIndex = m_Random.Next(moveList.Count);
-				return moveList[moveIndex];
+			if (moveList.Count > 0)
+			{
+				return moveList[m_Random.Next(moveList.Count)];
 			}
 
 			return null;
 		}
 
-		public Move? DetermineMoveChecked(IPieceMap map, ETeam team, IPiece general, int x, int y, List<(IPiece piece, int x, int y)> army)
+		public Move? DetermineMoveChecked(IPieceMap map, ETeam team, BoardInfo info)
 		{
-			foreach (var a in army)
+			foreach (var friendly in info.Friendly)
 			{
-				using (var moves = a.piece.GetMoves(a.x, a.y, map))
+				using (var moves = friendly.Piece.GetMoves(friendly.X, friendly.Y, map))
 				{
 					while (moves.MoveNext())
 					{
 						var move = moves.Current;
-						if (a.piece is General)
+						if (friendly.Piece is General)
 						{
 							// General cannot make move that puts it in danger, no need to check
-
 
 							var attackord = map.CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, team);
 							if (attackord != null)
@@ -96,7 +64,7 @@ namespace AdvanceEngine.AI
 						}
 
 						var mutated = map.Mutate(move);
-						var attackor = mutated.CheckForDanger(x, y, team);
+						var attackor = mutated.CheckForDanger(info.Self.X, info.Self.Y, team);
 
 						if (attackor == null)
 						{

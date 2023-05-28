@@ -139,6 +139,7 @@ namespace AdvanceEngine.Models
 							}
 						}
 
+
 						yield return new Move(0, -1, attackMutator, current.ConvertsEnemy ? EMoveType.Convert : EMoveType.Attack, self)
 						{
 							Origin = (x, y),

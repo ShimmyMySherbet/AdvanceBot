@@ -30,7 +30,7 @@
 		{
 			this.pngRender = new System.Windows.Forms.PictureBox();
 			this.gbTeam = new System.Windows.Forms.GroupBox();
-			this.btnRedo = new System.Windows.Forms.Button();
+			this.btnReset = new System.Windows.Forms.Button();
 			this.button1 = new System.Windows.Forms.Button();
 			this.lblWinner = new System.Windows.Forms.Label();
 			this.lblTurn = new System.Windows.Forms.Label();
@@ -63,7 +63,7 @@
 			// 
 			// gbTeam
 			// 
-			this.gbTeam.Controls.Add(this.btnRedo);
+			this.gbTeam.Controls.Add(this.btnReset);
 			this.gbTeam.Controls.Add(this.button1);
 			this.gbTeam.Controls.Add(this.lblWinner);
 			this.gbTeam.Controls.Add(this.lblTurn);
@@ -75,16 +75,16 @@
 			this.gbTeam.TabStop = false;
 			this.gbTeam.Text = "Game";
 			// 
-			// btnRedo
+			// btnReset
 			// 
-			this.btnRedo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnRedo.Location = new System.Drawing.Point(131, 70);
-			this.btnRedo.Name = "btnRedo";
-			this.btnRedo.Size = new System.Drawing.Size(121, 31);
-			this.btnRedo.TabIndex = 3;
-			this.btnRedo.Text = "Redo Move";
-			this.btnRedo.UseVisualStyleBackColor = true;
-			this.btnRedo.Visible = false;
+			this.btnReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.btnReset.Location = new System.Drawing.Point(131, 70);
+			this.btnReset.Name = "btnReset";
+			this.btnReset.Size = new System.Drawing.Size(121, 31);
+			this.btnReset.TabIndex = 3;
+			this.btnReset.Text = "Reset Board";
+			this.btnReset.UseVisualStyleBackColor = true;
+			this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
 			// 
 			// button1
 			// 
@@ -289,7 +289,7 @@
 		private Label lblWhiteStatus;
 		private Label lblBlackStatus;
 		private Label lblWinner;
-		private Button btnRedo;
+		private Button btnReset;
 		private Button button1;
 	}
 }

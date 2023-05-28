@@ -9,8 +9,10 @@ namespace AdvanceGame.UI
 		private List<_AIModelInfo> Models { get; } = new List<_AIModelInfo>()
 		{
 			new _AIModelInfo("AI Level 4", "Advance AI bot implemented to level 4 (Pass).\r\nSelects a random valid move each turn. Does not employ any strategy or move planning or prediction.", "Low", () => new AILevel4()),
-			new _AIModelInfo("AI Level 5", "Advance AI bot implemented to level 5 (Credit).\nTakes a winning move if presented, and prefers moves that place the enemy in check. For other moves it selects one at random. Does not employ any long term strategy.", "Low-Medium", () => new AILevel5()),
-			new _AIModelInfo("AI Level 6", "Advance AI bot implemented to level 6 (Distinction).\nTakes winning moves if possible. Prefers moves with a higher score difference, then prefers moves that threaten the enemy General. Does not plan ahead or employ any long term strategy", "Medium", () => new AILevel6())
+			new _AIModelInfo("AI Level 5", "Advance AI bot implemented to level 5 (Credit).\r\nTakes a winning move if presented, and prefers moves that place the enemy in check. For other moves it selects one at random. Does not employ any long term strategy.", "Low-Medium", () => new AILevel5()),
+			new _AIModelInfo("AI Level 6", "Advance AI bot implemented to level 6 (Distinction).\r\nTakes winning moves if possible. Prefers moves with a higher score difference, then prefers moves that threaten the enemy General. Does not plan ahead or employ any long term strategy", "Medium", () => new AILevel6()),
+			new _AIModelInfo("AI Level 7", "Advance AI bot implemented to level 7 (High Distinction)\r\n" +
+				"Takes winning moves if possible. Prefers moves with a higher score difference, and moves that theaten the enemy General. Can plan ahead 2 moves by predicting the opponent when multiple moves of equal immediate value are available.\n Uses AI level 6 as a predictor.", "Medium-Heavy", () => new AILevel7(predictor: new AILevel6()))
 		};
 
 		public AISelector()

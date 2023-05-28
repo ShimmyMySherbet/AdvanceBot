@@ -189,5 +189,46 @@ namespace AdvanceEngine.Models
 			}
 			return new BoardInfo(self.Value, opponent.Value, friendly, hostile);
 		}
+
+		public int GetTeamValue(ETeam team)
+		{
+			var value = 0;
+			for (int x = 0; x < 9; x++)
+			{
+				for (int y = 0; y < 9; y++)
+				{
+					var piece = m_Map[x, y];
+					if (piece != null && piece.Team == team)
+					{
+						value += piece.ScoreValue;
+					}
+				}
+			}
+			return value;
+		}
+
+		public int GetTeamLead(ETeam team)
+		{
+			var value = 0;
+			for (int x = 0; x < 9; x++)
+			{
+				for (int y = 0; y < 9; y++)
+				{
+					var piece = m_Map[x, y];
+					if (piece != null)
+					{
+						if (piece.Team == team)
+						{
+							value += piece.ScoreValue;
+						}
+						else
+						{
+							value -= piece.ScoreValue;
+						}
+					}
+				}
+			}
+			return value;
+		}
 	}
 }

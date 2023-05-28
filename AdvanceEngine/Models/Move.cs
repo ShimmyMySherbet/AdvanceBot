@@ -8,9 +8,9 @@ namespace AdvanceEngine.Models
 	/// </summary>
 	public class Move
 	{
-		public float ScoreChange => OwnScoreChange - EnemyScoreChange;
-		public float EnemyScoreChange { get; }
-		public float OwnScoreChange { get; }
+		public int ScoreChange => OwnScoreChange - EnemyScoreChange;
+		public int EnemyScoreChange { get; }
+		public int OwnScoreChange { get; }
 
 		public EPieceType? TargetPiece { get; set; }
 		public IPiece? Self { get; set; }
@@ -22,7 +22,7 @@ namespace AdvanceEngine.Models
 
 		public MapMutator Mutator { get; }
 
-		public Move(float scoreChange, int enemyScoreChange, MapMutator mutator, EMoveType type, IPiece? self)
+		public Move(int scoreChange, int enemyScoreChange, MapMutator mutator, EMoveType type, IPiece? self)
 		{
 			OwnScoreChange = scoreChange;
 			EnemyScoreChange = enemyScoreChange;

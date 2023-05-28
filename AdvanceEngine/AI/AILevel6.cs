@@ -1,4 +1,5 @@
-﻿using AdvanceEngine.Models;
+﻿using System.Data;
+using AdvanceEngine.Models;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Exceptions;
 using AdvanceEngine.Models.Interfaces;
@@ -27,7 +28,8 @@ namespace AdvanceEngine.AI
 
 			var info = pieceMap.GetBoardInfo(team);
 
-			var allMoves = new List<(Move move, ECheckState state)>();
+			var goodMoves = new List<(Move move, ECheckState enemyState)>();
+			var badMoves = new List<(Move move, ECheckState enemyState)>();
 			foreach (var piece in info.Friendly)
 			{
 				using (var moves = piece.Piece.GetMoves(piece.X, piece.Y, pieceMap))
@@ -36,36 +38,51 @@ namespace AdvanceEngine.AI
 					{
 						var move = moves.Current;
 
+						if (move.TargetPiece == EPieceType.General)
+						{
+							continue;
+						}
+
 						var mutated = pieceMap.Mutate(move);
 
-						var checkState = mutated.CheckState(enemy);
+						var enemyCheckState = mutated.CheckState(enemy);
 
-						if (checkState == ECheckState.Checkmate)
+						if (enemyCheckState == ECheckState.Checkmate)
 						{
 							return move;
 						}
 
-						// total shift in score
+						var selfCheck = mutated.CheckState(team);
 
-						allMoves.Add((move, checkState));
+						if (selfCheck == ECheckState.Check || selfCheck == ECheckState.Checkmate)
+						{
+							badMoves.Add((move, enemyCheckState));
+						}
+
+						// total shift in score
+						goodMoves.Add((move, enemyCheckState));
 					}
 				}
 			}
 
-			if (allMoves.Count == 0)
+
+			if (goodMoves.Count == 0)
+				goodMoves = badMoves;
+
+			if (goodMoves.Count == 0)
 			{
 				// no moves possible
 				return null;
 			}
 
 			// Selects a move with the max score increase. Prefers moves that threaten the opponent.
-			var sorted = allMoves.OrderByDescending(x => x.move.ScoreChange).ToArray();
+			var sorted = goodMoves.OrderByDescending(x => x.move.ScoreChange).ToArray();
 			var max = sorted[0];
 			var maxed = sorted.Where(x => x.move.ScoreChange == max.move.ScoreChange).ToArray();
 
 			foreach (var m in maxed)
 			{
-				if (m.state == ECheckState.Check)
+				if (m.enemyState == ECheckState.Check)
 				{
 					return m.move;
 				}

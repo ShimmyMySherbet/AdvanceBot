@@ -52,5 +52,10 @@ namespace AdvanceEngine.Models
 		}
 
 		public abstract IPiece Convert(ETeam team);
+
+		public override string ToString()
+		{
+			return $"{Team} {PieceType}";
+		}
 	}
 }
