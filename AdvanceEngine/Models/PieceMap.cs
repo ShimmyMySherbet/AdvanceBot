@@ -83,39 +83,30 @@ namespace AdvanceEngine.Models
 			return new PieceMap(newMap);
 		}
 
-		public IPiece? CheckForDanger(int x, int y, ETeam team)
+		public IPiece? CheckForDanger(int x, int y, IPiece piece, Move? move = null)
 		{
-			var attacker = team == ETeam.White ? ETeam.Black : ETeam.White;
 
-			for (int px = 0; px < 9; px++)
+			var mutated = move != null ? Mutate(move) : this;
+
+			for(int locX = 0; locX < 9; locX++)
 			{
-				for (int py = 0; py < 9; py++)
+				for(int locY = 0; locY < 9; locY++)
 				{
-					var piece = GetPieceAtPosition(px, py);
+					var lookupPiece = mutated.GetPieceAtPosition(locX, locY);
 
-					if (piece != null && piece.Team == attacker)
+					if (lookupPiece != null && lookupPiece.Team == piece.Team.Enemy())
 					{
-
-						if (piece is Miner)
+						using (var enemyMoves = lookupPiece.GetMoves(locX, locY, mutated, x, y, true))
 						{
-							Console.WriteLine();
-						}
-
-						using (var moves = piece.GetMoves(px, py, this, x, y))
-						{
-							while (moves.MoveNext())
+							while (enemyMoves.MoveNext())
 							{
-								if (!moves.Current.Potential.CanAttack)
-									continue;
-
-
-								return piece;
+								return lookupPiece;
 							}
 						}
 					}
+
 				}
 			}
-
 			return null;
 		}
 
@@ -123,63 +114,33 @@ namespace AdvanceEngine.Models
 		{
 			var info = GetBoardInfo(team);
 
-			//if (CheckForDanger(info.Self.X, info.Self.Y, team) == null)
-			//{
-			//	return ECheckState.None;
-			//}
-
-
-
-			var armyMutated = Mutate(Mutators.RemoveArmy(team));
-			var hasMoves = false;
-			using(var selfMoves = info.Self.Piece.GetMoves(info.Self.X, info.Self.Y, armyMutated))
-			{
-				while (selfMoves.MoveNext())
-				{
-					hasMoves = true;
-					break;
-				}
-			}
-
-			if (!hasMoves)
-			{
-				return ECheckState.Checkmate;
-			}
-
-
-			var danger = CheckForDanger(info.Self.X, info.Self.Y, team) != null;
-			if (!danger)
-			{
-				return ECheckState.None;
-			}
-
+			var inDanger = CheckForDanger(info.Self.X, info.Self.Y, info.Self.Piece) != null;
 
 
 			foreach (var friendly in info.Friendly)
 			{
-				using (var moves = friendly.Piece.GetMoves(friendly.X, friendly.Y, this))
+				using(var moves = friendly.Piece.GetMoves(friendly.X, friendly.Y, this))
 				{
-					while (moves.MoveNext())
+					while(moves.MoveNext())
 					{
 						var move = moves.Current;
+						var mutated = Mutate(move);
+						var subInfo = mutated.GetBoardInfo(team);
 
-						if (friendly.Piece is General)
+						if (mutated.CheckForDanger(subInfo.Self.X, subInfo.Self.Y, subInfo.Self.Piece) == null)
 						{
-							if (CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, team) == null)
+							// can make a move that is safe
+
+							if (inDanger)
 							{
 								return ECheckState.Check;
 							}
-							continue;
-						}
-
-						var mutated = Mutate(move);
-						if (mutated.CheckForDanger(info.Self.X, info.Self.Y, team) == null)
-						{
-							return ECheckState.Check;
+							return ECheckState.None;
 						}
 					}
 				}
 			}
+
 			return ECheckState.Checkmate;
 		}
 
@@ -245,6 +206,7 @@ namespace AdvanceEngine.Models
 			}
 			return value;
 		}
+
 
 		public int GetTeamLead(ETeam team)
 		{

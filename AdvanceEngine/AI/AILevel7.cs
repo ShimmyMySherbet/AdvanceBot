@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks.Sources;
-using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Exceptions;
@@ -35,7 +33,7 @@ namespace AdvanceEngine.AI
 		{
 			var info = pieceMap.GetBoardInfo(team);
 
-			var danger = pieceMap.CheckForDanger(info.Self.X, info.Self.Y, team) != null;
+			var danger = pieceMap.CheckForDanger(info.Self.X, info.Self.Y, info.Self.Piece) != null;
 			var currentMax = int.MinValue;
 			var bestMoves = new List<Move>();
 
@@ -48,11 +46,23 @@ namespace AdvanceEngine.AI
 					{
 						var move = moves.Current;
 
+						if (move.TargetPiece == EPieceType.General)
+						{
+							Console.WriteLine("fuck");
+						}
+
 						if (danger)
 						{
 							// We're in check, only allow moves that get us out of check
-							var dangerMutated = pieceMap.Mutate(move);
-							if (dangerMutated.CheckState(team) != ECheckState.None)
+							try
+							{
+								var dangerMutated = pieceMap.Mutate(move);
+								if (dangerMutated.CheckState(team) != ECheckState.None)
+								{
+									continue;
+								}
+							}
+							catch (InvalidOperationException)
 							{
 								continue;
 							}
@@ -65,7 +75,7 @@ namespace AdvanceEngine.AI
 							return move;
 						}
 
-						
+
 						if (move.ScoreChange > currentMax)
 						{
 							bestMoves.Clear();
@@ -113,12 +123,17 @@ namespace AdvanceEngine.AI
 			var moves = new List<Move>();
 			var discriminator = 0;
 
+			if (move.TargetPiece == EPieceType.General)
+			{
+				Console.WriteLine("fuck");
+			}
+
 			// our first move
 			var mutated = baseMap.Mutate(move);
 			moves.Add(move);
 
 			var mutatedInfo = mutated.GetBoardInfo(team);
-			if (mutated.CheckForDanger(mutatedInfo.Opponent.X, mutatedInfo.Opponent.Y, team.Enemy()) != null)
+			if (mutated.CheckForDanger(mutatedInfo.Opponent.X, mutatedInfo.Opponent.Y, mutatedInfo.Opponent.Piece) != null)
 			{
 				// enemy is threatened 
 				discriminator++;
@@ -128,9 +143,12 @@ namespace AdvanceEngine.AI
 			try
 			{
 				var opponentMove = EnemyPredictor.DetermineMove(mutated, team.Enemy());
-
 				if (opponentMove != null)
 				{
+					if (opponentMove.TargetPiece == EPieceType.General)
+					{
+						Console.WriteLine("fuck");
+					}
 					moves.Add(opponentMove);
 					mutated = mutated.Mutate(opponentMove);
 				}
@@ -148,6 +166,10 @@ namespace AdvanceEngine.AI
 
 				if (selfMove != null)
 				{
+					if (selfMove.TargetPiece == EPieceType.General)
+					{
+						Console.WriteLine("fuck");
+					}
 					moves.Add(selfMove);
 					mutated = mutated.Mutate(selfMove);
 				}
@@ -158,9 +180,8 @@ namespace AdvanceEngine.AI
 				return (int.MinValue, discriminator);
 			}
 
-
 			mutatedInfo = mutated.GetBoardInfo(team);
-			if (mutated.CheckForDanger(mutatedInfo.Opponent.X, mutatedInfo.Opponent.Y, team.Enemy()) != null)
+			if (mutated.CheckForDanger(mutatedInfo.Opponent.X, mutatedInfo.Opponent.Y, mutatedInfo.Opponent.Piece) != null)
 			{
 				// enemy is threatened 
 				discriminator++;

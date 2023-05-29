@@ -25,7 +25,7 @@ namespace AdvanceEngine.Models
 		/// <param name="filterX">Filters moves to only ones targeting positions with the specified X value</param>
 		/// <param name="filterY">Filters moves to only ones targeting positions with the specified Y value</param>
 		/// <returns>An enumeration of possible moves, with their board mutator</returns>
-		public virtual IEnumerator<Move> GetMoves(int x, int y, IPieceMap map, int filterX = -1, int filterY = -1)
+		public virtual IEnumerator<Move> GetMoves(int x, int y, IPieceMap map, int filterX = -1, int filterY = -1, bool ignoreSafety = false)
 		{
 			var dir = Team == ETeam.White ? -1 : 1;
 			var self = map.GetPieceAtPosition(x, y);
@@ -130,10 +130,10 @@ namespace AdvanceEngine.Models
 							map[current.TargetX, current.TargetY] = null;
 						};
 
-						if (current.MustNotBeCaptured)
+						if (!ignoreSafety && current.MustNotBeCaptured)
 						{
 							var newBoard = map.Mutate(attackMutator);
-							var danger = newBoard.CheckForDanger(current.TargetX, current.TargetY, Team);
+							var danger = newBoard.CheckForDanger(current.TargetX, current.TargetY, this);
 							if (danger != null)
 							{
 								// Danger!
@@ -141,7 +141,9 @@ namespace AdvanceEngine.Models
 							}
 						}
 
-						yield return new Move(0, -1, attackMutator, current.ConvertsEnemy ? EMoveType.Convert : EMoveType.Attack, self, current)
+						var ownScore = current.ConvertsEnemy ? target.ScoreValue : 0;
+
+						yield return new Move(ownScore, target.ScoreValue * -1, attackMutator, current.ConvertsEnemy ? EMoveType.Convert : EMoveType.Attack, self, current)
 						{
 							Origin = (x, y),
 							TargetPiece = target.PieceType,
@@ -164,10 +166,10 @@ namespace AdvanceEngine.Models
 							map[current.TargetX, current.TargetY] = new Wall();
 						};
 
-						if (current.MustNotBeCaptured)
+						if (!ignoreSafety && current.MustNotBeCaptured)
 						{
 							var newBoard = map.Mutate(mutator);
-							var danger = newBoard.CheckForDanger(current.TargetX, current.TargetY, Team);
+							var danger = newBoard.CheckForDanger(current.TargetX, current.TargetY, this);
 							if (danger != null)
 							{
 								// Danger!
@@ -199,7 +201,7 @@ namespace AdvanceEngine.Models
 					if (current.MustNotBeCaptured)
 					{
 						var newBoard = map.Mutate(moveMutator);
-						var danger = newBoard.CheckForDanger(current.TargetX, current.TargetY, Team);
+						var danger = newBoard.CheckForDanger(current.TargetX, current.TargetY, this);
 						if (danger != null)
 						{
 							// Danger!
@@ -270,7 +272,7 @@ namespace AdvanceEngine.Models
 					}
 
 
-					if (map.CheckForDanger(move.TargetX, move.TargetY, Team) == null)
+					if (map.CheckForDanger(move.TargetX, move.TargetY, this) == null)
 					{
 						return false;
 					}

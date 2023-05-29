@@ -14,7 +14,7 @@ namespace AdvanceEngine.Models.Interfaces
 
 		public bool Convertable { get; }
 
-		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map, int filterX = -1, int filyerY = -1);
+		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map, int filterX = -1, int filyerY = -1, bool ignoreSafety = false);
 
 		public IPiece Convert(ETeam team);
 

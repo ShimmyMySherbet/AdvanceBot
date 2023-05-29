@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
@@ -387,6 +388,7 @@ namespace AdvanceGame.UI
 			{
 				if (ofd.ShowDialog() == DialogResult.OK)
 				{
+					Text = $"Game Window ({ofd.SafeFileName})";
 					Map = PieceMap.Default
 						.Mutate(Mutators.LoadFromFile(ofd.FileName));
 					Render();

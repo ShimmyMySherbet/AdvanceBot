@@ -102,7 +102,7 @@ namespace AdvanceEngine.AI
 			{
 				var mutated = map.Mutate(move);
 				var info = mutated.GetBoardInfo(team);
-				var danger = mutated.CheckForDanger(info.Self.X, info.Self.Y, team) != null;
+				var danger = mutated.CheckForDanger(info.Self.X, info.Self.Y, info.Self.Piece) != null;
 
 				if (danger)
 				{

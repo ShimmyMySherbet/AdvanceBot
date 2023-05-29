@@ -16,7 +16,7 @@ namespace AdvanceEngine.Models.Interfaces
 
 		IPieceMap Mutate(MapMutator mutator);
 
-		IPiece? CheckForDanger(int x, int y, ETeam team);
+		IPiece? CheckForDanger(int x, int y, IPiece piece, Move? move = null);
 
 		ECheckState CheckState(ETeam team);
 

@@ -18,7 +18,7 @@ namespace AdvanceEngine.AI
 		{
 			var info = pieceMap.GetBoardInfo(team);
 
-			var threat = pieceMap.CheckForDanger(info.Self.X, info.Self.Y, team);
+			var threat = pieceMap.CheckForDanger(info.Self.X, info.Self.Y, info.Self.Piece);
 			if (threat != null)
 			{
 				return DetermineMoveChecked(pieceMap, team, info);
@@ -44,7 +44,7 @@ namespace AdvanceEngine.AI
 
 				var mutated = pieceMap.Mutate(moveList[indIndex]);
 				var mutatedInfo = mutated.GetBoardInfo(team);
-				if (mutated.CheckForDanger(mutatedInfo.Self.X, mutatedInfo.Self.Y, team) != null)
+				if (mutated.CheckForDanger(mutatedInfo.Self.X, mutatedInfo.Self.Y, mutatedInfo.Self.Piece) != null)
 				{
 					moveList.RemoveAt(indIndex);
 				}
@@ -68,7 +68,7 @@ namespace AdvanceEngine.AI
 						{
 							// General cannot make move that puts it in danger, no need to check
 
-							var attackord = map.CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, team);
+							var attackord = map.CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, friendly.Piece, move);
 							if (attackord == null)
 							{
 								return move;
@@ -77,7 +77,7 @@ namespace AdvanceEngine.AI
 						}
 
 						var mutated = map.Mutate(move);
-						var attackor = mutated.CheckForDanger(info.Self.X, info.Self.Y, team);
+						var attackor = mutated.CheckForDanger(info.Self.X, info.Self.Y, info.Self.Piece, move);
 
 						if (attackor == null)
 						{

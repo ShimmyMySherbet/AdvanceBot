@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Data;
+using System.IO;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Exceptions;
@@ -104,6 +105,28 @@ namespace AdvanceEngine.Models
 				}
 			};
 		}
+
+		public static MapMutator MovePiece(PieceInfo info, int x, int y)
+		{
+			return (IPiece?[,] map) =>
+			{
+				map[info.X, info.Y] = null;
+				map[x, y] = info.Piece;
+			};
+		}
+
+		public static MapMutator CreateDummy(int x, int y, ETeam team)
+		{
+			return (IPiece?[,] map) =>
+			{
+				if (map[x, y]?.Team == team)
+				{
+					return;
+				}
+				map[x, y] = new Dummy(team);
+			};
+		}
+
 
 		private static IPiece? ConvertToPiece(char c)
 		{

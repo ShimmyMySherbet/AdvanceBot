@@ -1,6 +1,6 @@
 ﻿namespace AdvanceEngine.Models.Enums
 {
-	public enum EPieceType
+	public enum EPieceType : int
 	{
 		Builder,
 		Catapult,

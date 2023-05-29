@@ -117,7 +117,7 @@ namespace AdvanceEngine.AI
 						{
 							// General cannot make move that puts it in danger, no need to check
 
-							var attackord = pieceMap.CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, team);
+							var attackord = pieceMap.CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, a.piece, move);
 							if (attackord != null)
 							{
 								return move;
@@ -126,7 +126,7 @@ namespace AdvanceEngine.AI
 						}
 
 						var mutated = pieceMap.Mutate(move);
-						var attackor = mutated.CheckForDanger(self.x, self.y, team);
+						var attackor = mutated.CheckForDanger(self.x, self.y, self.piece);
 
 						if (attackor == null)
 						{
