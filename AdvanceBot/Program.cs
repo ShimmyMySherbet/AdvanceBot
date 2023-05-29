@@ -1,4 +1,9 @@
-﻿using System.Windows.Markup;
+﻿using System;
+using System.IO;
+using AdvanceEngine;
+using AdvanceEngine.AI;
+using AdvanceEngine.Models;
+using AdvanceEngine.Models.Enums;
 
 namespace AdvanceBot
 {
@@ -6,53 +11,47 @@ namespace AdvanceBot
 	{
 		static void Main(string[] args)
 		{
-			Console.WriteLine("Hello, World!");
-
-			var map = new int[12, 12];
-			map[0, 0] = 20;
-			map[1, 1] = 30;
-			map[11,11] = 100;
-
-			C(map);
-
-
-			var n = new int[12, 12];
-
-			Array.Copy(map, n, map.Length);
-
-			n[1, 2] = 22;
-
-			Console.WriteLine();
-			Console.WriteLine();
-			C(n);
-
-
-
-		}
-		public static void C(int[,] d)
-		{
-			for (int x = 0; x < d.GetLength(0); x++)
+			if (args.Length == 1 && args[0].Equals("Name", StringComparison.InvariantCultureIgnoreCase))
 			{
-				for (int y = 0; y < d.GetLength(1); y++)
-				{
-					Console.Write($"{d[x, y]} ");
-				}
-				Console.WriteLine();
-			}
-		}
-		public readonly struct rd
-		{
-			public readonly int[,] Values = new int[2, 2];
-			public rd(int[,] values) { Values = values; }
-
-
-
-			public rd Mutate()
-			{
-				Values[0, 0] = 1;
-				return this;
+				Console.WriteLine("Tactical Retreat");
+				return;
 			}
 
+			if (args.Length < 3)
+			{
+				Console.WriteLine("Insufficient Arguments");
+				return;
+			}
+
+			if (!Enum.TryParse<ETeam>(args[0], true, out var team))
+			{
+				Console.WriteLine("Invalid Team.");
+				return;
+			}
+
+			var currentState = args[1];
+			var outState = args[2];
+
+			if (!File.Exists(currentState))
+			{
+				Console.WriteLine("Input board state file doesn't exist");
+				return;
+			}
+
+			var map = PieceMap.Default.Mutate(Mutators.LoadFromFile(currentState));
+
+			var ai = new AILevel7(predictor: new AILevel6());
+
+			var move = ai.DetermineMove(map, team);
+
+			if (move != null)
+			{
+				map = map.Mutate(move);
+			}
+
+			var result = map.Save();
+
+			File.WriteAllText(outState, result);
 		}
 	}
 }

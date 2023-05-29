@@ -2,12 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Engine\" />
+    <Compile Remove="Engine\**" />
+    <EmbeddedResource Remove="Engine\**" />
+    <None Remove="Engine\**" />
   </ItemGroup>
 
 </Project>

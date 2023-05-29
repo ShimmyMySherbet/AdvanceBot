@@ -1,8 +1,11 @@
 ﻿using System.Diagnostics;
+using System.Text;
+using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Exceptions;
 using AdvanceEngine.Models.Interfaces;
+using Newtonsoft.Json;
 
 namespace AdvanceGame.UI
 {
@@ -34,9 +37,14 @@ namespace AdvanceGame.UI
 		public bool BlackAIEnabled { get; set; } = false;
 		public IAdvanceAI? WhiteAI { get; set; }
 		public IAdvanceAI? BlackAI { get; set; }
+		public string WhiteAIName { get; set; } = string.Empty;
+		public string BlackAIName { get; set; } = string.Empty;
+
 
 		public int WhiteMoves { get; set; } = 0;
 		public int BlackMoves { get; set; } = 0;
+
+		public ETeam Winner { get; set; } = ETeam.Neutral;
 
 		public GameWindow()
 		{
@@ -142,6 +150,8 @@ namespace AdvanceGame.UI
 					winner = ETeam.Neutral;
 				}
 
+				Winner = winner;
+
 				if (winner == ETeam.Neutral)
 				{
 					lblWinner.Text = $"Draw!";
@@ -186,11 +196,11 @@ namespace AdvanceGame.UI
 			pngRender.Image = m_Renderer.Render(Map);
 		}
 
-		public void PromptForMove(ETeam team)
+		public void PromptForMove(ETeam team, bool ovr = false)
 		{
 			if (team == ETeam.Black)
 			{
-				if (BlackAIEnabled && BlackAI != null)
+				if (ovr || BlackAIEnabled && BlackAI != null)
 				{
 					lblBlackStatus.Text = "Status: Thinking...";
 
@@ -227,6 +237,7 @@ namespace AdvanceGame.UI
 							{
 								var enemy = team == ETeam.White ? ETeam.Black : ETeam.White;
 								lblWinner.Text = $"Winner: {enemy}";
+								Winner = enemy;
 								MessageBox.Show($"{enemy} Wins!");
 								lblBlackStatus.Text = $"Status: Moved (took {Math.Round(sw.ElapsedTicks / 10000f, 3)}ms)";
 
@@ -237,7 +248,7 @@ namespace AdvanceGame.UI
 			}
 			else if (team == ETeam.White)
 			{
-				if (WhiteAIEnabled && WhiteAI != null)
+				if (WhiteAI != null && (WhiteAIEnabled || ovr))
 				{
 					lblWhiteStatus.Text = "Status: Thinking...";
 					Task.Run(async () =>
@@ -265,7 +276,7 @@ namespace AdvanceGame.UI
 								});
 							}
 						}
-						catch (CheckmatedException)
+						catch (AdvanceEngine.Models.Exceptions.CheckmatedException)
 						{
 							sw.Stop();
 							Invoke(() =>
@@ -274,6 +285,7 @@ namespace AdvanceGame.UI
 								lblWinner.Text = $"Winner: {enemy}";
 								MessageBox.Show($"{enemy} Wins!");
 								lblWhiteStatus.Text = $"Status: Moved (took {Math.Round(sw.ElapsedTicks / 10000f, 3)}ms)";
+								Winner = enemy;
 							});
 						}
 					});
@@ -290,7 +302,8 @@ namespace AdvanceGame.UI
 					if (selector.SelectedModel != null)
 					{
 						WhiteAI = selector.SelectedModel();
-						lblWhiteAI.Text = $"Selected AI: {WhiteAI.Name}";
+						lblWhiteAI.Text = $"Selected AI: {selector.SelectedModelName}";
+						WhiteAIName = selector.SelectedModelName;
 						if (CurrentTeam == ETeam.White)
 						{
 							PromptForMove(CurrentTeam);
@@ -309,7 +322,9 @@ namespace AdvanceGame.UI
 					if (selector.SelectedModel != null)
 					{
 						BlackAI = selector.SelectedModel();
-						lblBlack.Text = $"Selected AI: {BlackAI.Name}";
+						lblBlack.Text = $"Selected AI: {selector.SelectedModelName}";
+						BlackAIName = selector.SelectedModelName;
+
 						if (CurrentTeam == ETeam.Black)
 						{
 							PromptForMove(CurrentTeam);
@@ -364,6 +379,176 @@ namespace AdvanceGame.UI
 			lblBlackMoves.Text = $"Moves: {BlackMoves}";
 			lblTurn.Text = $"Current Turn: {CurrentTeam}";
 			Render();
+		}
+
+		private void btnLoad_Click(object sender, EventArgs e)
+		{
+			using (var ofd = new OpenFileDialog() { Title = "Load board from file", Filter = "Text Files|*.txt" })
+			{
+				if (ofd.ShowDialog() == DialogResult.OK)
+				{
+					Map = PieceMap.Default
+						.Mutate(Mutators.LoadFromFile(ofd.FileName));
+					Render();
+				}
+			}
+		}
+
+		private void btnSave_Click(object sender, EventArgs e)
+		{
+			using (var sfd = new SaveFileDialog() { Filter = "Advance Bot Recording|*.adr", Title = "Save game recording" })
+			{
+				if (sfd.ShowDialog() == DialogResult.OK)
+				{
+					var saves = new List<_Save>();
+					m_History.Add((Map, CurrentTeam, BlackMoves, WhiteMoves));
+					foreach (var record in m_History)
+					{
+						var strings = new List<string>();
+						for (int y = 0; y < 9; y++)
+						{
+							var b = new StringBuilder();
+
+							for (int x = 0; x < 9; x++)
+							{
+								var piece = record.board.GetPieceAtPosition(x, y);
+
+								if (piece == null)
+								{
+									b.Append('.');
+								}
+								else if (piece is Wall)
+								{
+									b.Append('#');
+								}
+								else
+								{
+									var name = piece.PieceType.ToString();
+									var fc = name[0];
+
+									if (piece.Team == ETeam.White)
+									{
+										fc = char.ToUpper(fc);
+									}
+									else
+									{
+										fc = char.ToLower(fc);
+									}
+									b.Append(fc);
+								}
+							}
+							strings.Add(b.ToString());
+						}
+
+						saves.Add(new _Save()
+						{
+							Black = record.black,
+							White = record.white,
+							CurrentTeam = record.team,
+							State = strings
+						});
+					}
+
+					var wrapper = new _SaveWrapper()
+					{
+						Saves = saves,
+						Winner = Winner,
+						WhiteAI = WhiteAI != null ? WhiteAIName : null,
+						BlackAI = BlackAI != null ? BlackAIName : null,
+					};
+
+					var data = JsonConvert.SerializeObject(wrapper);
+					File.WriteAllText(sfd.FileName, data);
+				}
+			}
+		}
+
+		private class _SaveWrapper
+		{
+			public ETeam Winner { get; set; }
+			public List<_Save> Saves { get; set; } = new List<_Save>();
+			public string? BlackAI { get; set; }
+			public string? WhiteAI { get; set; }
+
+		}
+		private class _Save
+		{
+			public ETeam CurrentTeam { get; set; }
+			public int Black { get; set; }
+			public int White { get; set; }
+			public List<string> State { get; set; } = new List<string>();
+		}
+
+		private void button3_Click(object sender, EventArgs e)
+		{
+			using (var sfd = new OpenFileDialog() { Filter = "Advance Bot Recording|*.adr", Title = "Open game recording" })
+			{
+				if (sfd.ShowDialog() == DialogResult.OK)
+				{
+					var data = JsonConvert.DeserializeObject<_SaveWrapper>(File.ReadAllText(sfd.FileName));
+
+					if (data == null)
+					{
+						MessageBox.Show("Invalid recording file");
+						return;
+					}
+
+					lblWhiteAI.Text = $"Selecetd AI: {data.WhiteAI ?? "N/A"}";
+					lblBlack.Text = $"Selecetd AI: {data.BlackAI ?? "N/A"}";
+
+					cbBlackAI.Checked = data.BlackAI != null;
+					cbWhiteAI.Checked = data.WhiteAI != null;
+
+					Task.Run(async () =>
+					{
+						foreach (var save in data.Saves)
+						{
+							Invoke(() =>
+							{
+								Map = PieceMap.Default.Mutate(Mutators.LoadFromData(save.State.ToArray()));
+								CurrentTeam = save.CurrentTeam;
+								BlackMoves = save.Black;
+								WhiteMoves = save.White;
+								lblWhiteMoves.Text = $"Moves: {WhiteMoves}";
+								lblBlackMoves.Text = $"Moves: {BlackMoves}";
+								lblTurn.Text = $"Current Turn: {CurrentTeam}";
+								Render();
+							});
+
+							await Task.Delay(100);
+						}
+
+						await Task.Delay(200);
+						Invoke(() =>
+						{
+							lblWinner.Text = $"Winner: {data.Winner}";
+							MessageBox.Show($"{data.Winner} Wins!");
+						});
+
+					});
+
+				}
+			}
+		}
+
+		private void btnRunMove_Click(object sender, EventArgs e)
+		{
+			PromptForMove(ETeam.White, true);
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			PromptForMove(ETeam.Black, true);
+
+		}
+
+		private void btnDebug_Click(object sender, EventArgs e)
+		{
+			var blackState = Map.CheckState(ETeam.Black);
+			var whiteState = Map.CheckState(ETeam.White);
+
+			Debug.WriteLine($"Black: {blackState}");
+			Debug.WriteLine($"White: {whiteState}");
 		}
 	}
 }

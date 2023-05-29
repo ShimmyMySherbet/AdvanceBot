@@ -1,4 +1,5 @@
-﻿using AdvanceEngine.Models;
+﻿using System.Collections.Generic;
+using AdvanceEngine.Models;
 using AdvanceEngine.Models.Attributes;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
@@ -18,11 +19,15 @@ namespace AdvanceEngine.Logic.Pieces
 			{
 				for (int offsetY = -1; offsetY < 2; offsetY++)
 				{
-					if (offsetX == x && offsetY == y)
+
+					var newX = x + offsetX;
+					var newY = y + offsetY;
+
+					if (offsetX == newX && offsetY == newY)
 						continue;
 
-					yield return new PotentialMove(x + offsetX, y + offsetY);
-					yield return new PotentialMove(x + offsetX, y + offsetY, isBuildMove: true);
+					yield return new PotentialMove(newX, newY);
+					yield return new PotentialMove(newX, newY, isBuildMove: true);
 				}
 			}
 		}

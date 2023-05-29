@@ -1,4 +1,5 @@
-﻿using AdvanceEngine.Models.Enums;
+﻿using System;
+using AdvanceEngine.Models.Enums;
 
 namespace AdvanceEngine.Models.Exceptions
 {

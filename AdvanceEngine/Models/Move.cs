@@ -22,13 +22,21 @@ namespace AdvanceEngine.Models
 
 		public MapMutator Mutator { get; }
 
-		public Move(int scoreChange, int enemyScoreChange, MapMutator mutator, EMoveType type, IPiece? self)
+		public PotentialMove Potential { get; }
+
+		public Move(int scoreChange, int enemyScoreChange, MapMutator mutator, EMoveType type, IPiece? self, PotentialMove potential)
 		{
 			OwnScoreChange = scoreChange;
 			EnemyScoreChange = enemyScoreChange;
 			Mutator = mutator;
 			MoveType = type;
 			Self = self;
+			Potential = potential;
+		}
+
+		public override string ToString()
+		{
+			return $"[({Self} {Origin.x}, {Origin.y}) {MoveType} -> ({TargetPiece} {TargetPosition?.x}, {TargetPosition?.y})]";
 		}
 	}
 }

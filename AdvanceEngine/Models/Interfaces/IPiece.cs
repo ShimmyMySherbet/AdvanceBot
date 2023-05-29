@@ -1,4 +1,5 @@
-﻿using AdvanceEngine.Logic.PieceLogic;
+﻿using System.Collections.Generic;
+using AdvanceEngine.Logic.PieceLogic;
 using AdvanceEngine.Models.Enums;
 
 namespace AdvanceEngine.Models.Interfaces
@@ -16,5 +17,7 @@ namespace AdvanceEngine.Models.Interfaces
 		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map, int filterX = -1, int filyerY = -1);
 
 		public IPiece Convert(ETeam team);
+
+		bool IsLockedByEnemy(int x, int y, IPieceMap map);
 	}
 }

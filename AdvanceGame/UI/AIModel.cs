@@ -2,12 +2,14 @@
 
 namespace AdvanceGame.UI
 {
-	public delegate void ModelSelectedEvent(Func<IAdvanceAI> factory);
+	public delegate void ModelSelectedEvent(Func<IAdvanceAI> factory, string name);
 	public partial class AIModel : UserControl
 	{
 		public Func<IAdvanceAI>? Factory { get; }
 
 		public event ModelSelectedEvent? OnModelSelected;
+
+		public string ModelName { get; } = string.Empty;
 
 		public AIModel()
 		{
@@ -21,13 +23,14 @@ namespace AdvanceGame.UI
 			txtDescription.Text = descr;
 			lblIntensity.Text = $"Computational Intensity: {intensity}";
 			Factory = factory;
+			ModelName = name;
 		}
 
 		private void btnSelect_Click(object sender, EventArgs e)
 		{
 			if (Factory != null)
 			{
-				OnModelSelected?.Invoke(Factory);
+				OnModelSelected?.Invoke(Factory, ModelName);
 			}
 		}
 	}

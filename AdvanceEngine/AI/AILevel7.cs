@@ -1,4 +1,8 @@
-﻿using System.Threading.Tasks.Sources;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks.Sources;
+using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Exceptions;
@@ -10,13 +14,21 @@ namespace AdvanceEngine.AI
 	{
 		public string Name => "AI Level 7";
 
-		public IAdvanceAI Predictor { get; set; }
+		public IAdvanceAI EnemyPredictor { get; set; }
+		public IAdvanceAI SelfPredictor { get; set; }
 
 		private Random m_Random = new Random();
 
 		public AILevel7(IAdvanceAI predictor)
 		{
-			Predictor = predictor;
+			EnemyPredictor = predictor;
+			SelfPredictor = predictor;
+		}
+
+		public AILevel7(IAdvanceAI enemyPredictor, IAdvanceAI selfPredictor)
+		{
+			EnemyPredictor = enemyPredictor;
+			SelfPredictor = selfPredictor;
 		}
 
 		public Move? DetermineMove(IPieceMap pieceMap, ETeam team)
@@ -29,6 +41,7 @@ namespace AdvanceEngine.AI
 
 			foreach (var friendly in info.Friendly)
 			{
+
 				using (var moves = friendly.Piece.GetMoves(friendly.X, friendly.Y, pieceMap))
 				{
 					while (moves.MoveNext())
@@ -38,13 +51,21 @@ namespace AdvanceEngine.AI
 						if (danger)
 						{
 							// We're in check, only allow moves that get us out of check
-							var mutated = pieceMap.Mutate(move);
-							if (mutated.CheckState(team) != ECheckState.None)
+							var dangerMutated = pieceMap.Mutate(move);
+							if (dangerMutated.CheckState(team) != ECheckState.None)
 							{
 								continue;
 							}
 						}
 
+						var mutated = pieceMap.Mutate(move);
+						var mutatedCheck = mutated.CheckState(team.Enemy());
+						if (mutatedCheck == ECheckState.Checkmate)
+						{
+							return move;
+						}
+
+						
 						if (move.ScoreChange > currentMax)
 						{
 							bestMoves.Clear();
@@ -69,7 +90,14 @@ namespace AdvanceEngine.AI
 
 			foreach (var move in bestMoves)
 			{
-				futureEvaluations.Add((move, EvaluateFutureValue(pieceMap, team, move)));
+				try
+				{
+					futureEvaluations.Add((move, EvaluateFutureValue(pieceMap, team, move)));
+				}
+				catch (Exception)
+				{
+					futureEvaluations.Add((move, (move.ScoreChange, 3)));
+				}
 			}
 			var maxEvaluation = futureEvaluations.Max(x => x.score.evaluation);
 			var highestOrder = futureEvaluations.Where(x => x.score.evaluation == maxEvaluation).ToArray();
@@ -99,7 +127,7 @@ namespace AdvanceEngine.AI
 			// Opponents move
 			try
 			{
-				var opponentMove = Predictor.DetermineMove(mutated, team.Enemy());
+				var opponentMove = EnemyPredictor.DetermineMove(mutated, team.Enemy());
 
 				if (opponentMove != null)
 				{
@@ -116,7 +144,7 @@ namespace AdvanceEngine.AI
 			// our response
 			try
 			{
-				var selfMove = Predictor.DetermineMove(mutated, team);
+				var selfMove = SelfPredictor.DetermineMove(mutated, team);
 
 				if (selfMove != null)
 				{

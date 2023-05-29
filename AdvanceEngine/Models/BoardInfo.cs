@@ -1,4 +1,6 @@
-﻿namespace AdvanceEngine.Models
+﻿using System.Collections.Generic;
+
+namespace AdvanceEngine.Models
 {
 	public readonly struct BoardInfo
 	{

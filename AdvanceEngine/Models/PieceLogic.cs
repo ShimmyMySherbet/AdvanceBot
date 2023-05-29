@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
@@ -30,6 +30,11 @@ namespace AdvanceEngine.Models
 			var dir = Team == ETeam.White ? -1 : 1;
 			var self = map.GetPieceAtPosition(x, y);
 
+			if (PieceType == EPieceType.Miner)
+			{
+				System.Console.WriteLine();
+			}
+
 			using (var moves = GetMoveDefinitions(x, y, dir))
 			{
 				while (moves.MoveNext())
@@ -46,12 +51,10 @@ namespace AdvanceEngine.Models
 						continue;
 					}
 
-
 					if (filterY != -1 && current.TargetY != filterY)
 					{
 						continue;
 					}
-
 
 					var target = map.GetPieceAtPosition(current.TargetX, current.TargetY);
 
@@ -64,7 +67,7 @@ namespace AdvanceEngine.Models
 								map[current.TargetX, current.TargetY] = self;
 								map[x, y] = target;
 							};
-							yield return new Move(0, 0, mutator, EMoveType.Move, self)
+							yield return new Move(0, 0, mutator, EMoveType.Move, self, current)
 							{
 								Origin = (x, y),
 								TargetPosition = (current.TargetX, current.TargetY),
@@ -109,7 +112,6 @@ namespace AdvanceEngine.Models
 							continue;
 						}
 
-
 						MapMutator attackMutator = (IPiece?[,] map) =>
 						{
 							if (current.ConvertsEnemy)
@@ -139,8 +141,7 @@ namespace AdvanceEngine.Models
 							}
 						}
 
-
-						yield return new Move(0, -1, attackMutator, current.ConvertsEnemy ? EMoveType.Convert : EMoveType.Attack, self)
+						yield return new Move(0, -1, attackMutator, current.ConvertsEnemy ? EMoveType.Convert : EMoveType.Attack, self, current)
 						{
 							Origin = (x, y),
 							TargetPiece = target.PieceType,
@@ -174,8 +175,7 @@ namespace AdvanceEngine.Models
 							}
 						}
 
-
-						yield return new Move(0, 0, mutator, EMoveType.Build, self)
+						yield return new Move(0, 0, mutator, EMoveType.Build, self, current)
 						{
 							Origin = (x, y),
 							TargetPosition = (current.TargetX, current.TargetY)
@@ -189,7 +189,6 @@ namespace AdvanceEngine.Models
 						// Cannot move
 						continue;
 					}
-
 
 					MapMutator moveMutator = (IPiece?[,] map) =>
 					{
@@ -208,8 +207,7 @@ namespace AdvanceEngine.Models
 						}
 					}
 
-
-					yield return new Move(0, 0, moveMutator, EMoveType.Move, self)
+					yield return new Move(0, 0, moveMutator, EMoveType.Move, self, current)
 					{
 						Origin = (x, y),
 						TargetPiece = null,
@@ -241,6 +239,46 @@ namespace AdvanceEngine.Models
 			}
 
 			return true;
+		}
+
+		public bool IsLockedByEnemy(int x, int y, IPieceMap map)
+		{
+			var dir = Team == ETeam.White ? -1 : 1;
+			using (var definitions = GetMoveDefinitions(x, y, dir))
+			{
+				while (definitions.MoveNext())
+				{
+					var move = definitions.Current;
+
+					if (!map.IsValidCoordinate(move.TargetX, move.TargetY))
+					{
+						continue;
+					}
+
+
+					var occupier = map.GetPieceAtPosition(move.TargetX, move.TargetY);
+
+					if (occupier != null && occupier.Team != Team)
+					{
+						continue;
+					}
+
+
+					if (!CheckSpaces(move.MustBeEmpty, map))
+					{
+						continue;
+					}
+
+
+					if (map.CheckForDanger(move.TargetX, move.TargetY, Team) == null)
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
+
 		}
 	}
 }

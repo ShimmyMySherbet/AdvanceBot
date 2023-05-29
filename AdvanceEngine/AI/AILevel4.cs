@@ -1,4 +1,6 @@
-﻿using AdvanceEngine.Logic.Pieces;
+﻿using System;
+using System.Collections.Generic;
+using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Exceptions;
@@ -34,9 +36,20 @@ namespace AdvanceEngine.AI
 				}
 			}
 
-			if (moveList.Count > 0)
+
+
+			while(moveList.Count > 0)
 			{
-				return moveList[m_Random.Next(moveList.Count)];
+				var indIndex = m_Random.Next(moveList.Count);
+
+				var mutated = pieceMap.Mutate(moveList[indIndex]);
+				var mutatedInfo = mutated.GetBoardInfo(team);
+				if (mutated.CheckForDanger(mutatedInfo.Self.X, mutatedInfo.Self.Y, team) != null)
+				{
+					moveList.RemoveAt(indIndex);
+				}
+
+				return moveList[indIndex];
 			}
 
 			return null;
@@ -56,7 +69,7 @@ namespace AdvanceEngine.AI
 							// General cannot make move that puts it in danger, no need to check
 
 							var attackord = map.CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, team);
-							if (attackord != null)
+							if (attackord == null)
 							{
 								return move;
 							}

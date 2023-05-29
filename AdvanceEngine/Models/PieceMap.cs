@@ -1,4 +1,6 @@
-﻿using AdvanceEngine.Logic;
+﻿using System;
+using System.Collections.Generic;
+using AdvanceEngine.Logic;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
@@ -93,10 +95,20 @@ namespace AdvanceEngine.Models
 
 					if (piece != null && piece.Team == attacker)
 					{
+
+						if (piece is Miner)
+						{
+							Console.WriteLine();
+						}
+
 						using (var moves = piece.GetMoves(px, py, this, x, y))
 						{
 							while (moves.MoveNext())
 							{
+								if (!moves.Current.Potential.CanAttack)
+									continue;
+
+
 								return piece;
 							}
 						}
@@ -111,10 +123,37 @@ namespace AdvanceEngine.Models
 		{
 			var info = GetBoardInfo(team);
 
-			if (CheckForDanger(info.Self.X, info.Self.Y, team) == null)
+			//if (CheckForDanger(info.Self.X, info.Self.Y, team) == null)
+			//{
+			//	return ECheckState.None;
+			//}
+
+
+
+			var armyMutated = Mutate(Mutators.RemoveArmy(team));
+			var hasMoves = false;
+			using(var selfMoves = info.Self.Piece.GetMoves(info.Self.X, info.Self.Y, armyMutated))
+			{
+				while (selfMoves.MoveNext())
+				{
+					hasMoves = true;
+					break;
+				}
+			}
+
+			if (!hasMoves)
+			{
+				return ECheckState.Checkmate;
+			}
+
+
+			var danger = CheckForDanger(info.Self.X, info.Self.Y, team) != null;
+			if (!danger)
 			{
 				return ECheckState.None;
 			}
+
+
 
 			foreach (var friendly in info.Friendly)
 			{
@@ -134,7 +173,7 @@ namespace AdvanceEngine.Models
 						}
 
 						var mutated = Mutate(move);
-						if (mutated.CheckForDanger(friendly.X, friendly.Y, team) == null)
+						if (mutated.CheckForDanger(info.Self.X, info.Self.Y, team) == null)
 						{
 							return ECheckState.Check;
 						}

@@ -16,5 +16,10 @@ namespace AdvanceEngine.Models
 			Y = y;
 			Piece = piece;
 		}
+
+		public override string ToString()
+		{
+			return $"[{Piece} ({X}, {Y})]";
+		}
 	}
 }

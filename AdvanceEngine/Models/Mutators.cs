@@ -1,5 +1,7 @@
-﻿using AdvanceEngine.Logic.Pieces;
+﻿using System.IO;
+using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models.Enums;
+using AdvanceEngine.Models.Exceptions;
 using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Models
@@ -63,6 +65,65 @@ namespace AdvanceEngine.Models
 			{
 				map[4, 4] = piece;
 			};
+		}
+		public static MapMutator LoadFromFile(string filename)
+		{
+			var lines = File.ReadAllLines(filename);
+
+			return LoadFromData(lines);
+		}
+		public static MapMutator LoadFromData(string[] data)
+		{
+			return (IPiece?[,] map) =>
+			{
+				for (int x = 0; x < 9; x++)
+				{
+					for (int y = 0; y < 9; y++)
+					{
+						map[x, y] = ConvertToPiece(data[y][x]);
+					}
+				}
+			};
+		}
+
+		public static MapMutator RemoveArmy(ETeam team)
+		{
+			return (IPiece?[,] map) =>
+			{
+				for(int x = 0; x < 9; x++)
+				{
+					for(int y = 0; y < 9; y++)
+					{
+						var piece = map[x, y];
+						
+						if (piece != null && piece.Team == team && piece.PieceType != EPieceType.General)
+						{
+							map[x, y] = null;
+						} 
+					}
+				}
+			};
+		}
+
+		private static IPiece? ConvertToPiece(char c)
+		{
+			var team = char.IsUpper(c) ? ETeam.White : ETeam.Black;
+
+			switch (char.ToLower(c))
+			{
+				case '.': return null;
+				case '#': return new Wall();
+				case 'm': return new Miner(team);
+				case 'j': return new Jester(team);
+				case 'd': return new Dragon(team);
+				case 's': return new Sentinel(team);
+				case 'g': return new General(team);
+				case 'c': return new Catapult(team);
+				case 'b': return new Builder(team);
+				case 'z': return new Zombie(team);
+			}
+
+			throw new UnknownPieceException(c);
 		}
 	}
 }

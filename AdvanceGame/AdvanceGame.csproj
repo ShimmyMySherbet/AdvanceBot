@@ -9,8 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="RawAssets\" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="RawAssets\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="RawAssets\**" />
+    <None Remove="Models\**" />
+    <None Remove="RawAssets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,7 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using AdvanceEngine.Models;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Exceptions;
@@ -90,6 +93,29 @@ namespace AdvanceEngine.AI
 
 			var mmaxed = sorted.Where(x => x.move.ScoreChange == max.move.ScoreChange).ToArray();
 			return maxed[m_Random.Next(maxed.Length)].move;
+		}
+
+
+		private Move? CheckMove(IPieceMap map, ETeam team, Move? move)
+		{
+			if (move != null)
+			{
+				var mutated = map.Mutate(move);
+				var info = mutated.GetBoardInfo(team);
+				var danger = mutated.CheckForDanger(info.Self.X, info.Self.Y, team) != null;
+
+				if (danger)
+				{
+					throw new InvalidOperationException();
+				}
+
+				return move;
+
+			}
+			else
+			{
+				return null;
+			}
 		}
 
 		private Move? DetermineMoveCheck(IPieceMap pieceMap, ETeam team)

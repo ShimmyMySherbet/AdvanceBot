@@ -1,4 +1,5 @@
-﻿using AdvanceEngine.Models;
+﻿using System.Collections.Generic;
+using AdvanceEngine.Models;
 using AdvanceEngine.Models.Attributes;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
@@ -22,9 +23,21 @@ namespace AdvanceEngine.Logic.Pieces
 			{
 				(int x, int y) pos = (x + slDir.x, y + slDir.y);
 
+
+				if (pos.x == -1 && pos.y == 0)
+				{
+					System.Console.WriteLine();
+				}
+
 				check.Clear();
 				while (pos.x >= 0 && pos.x < 9 && pos.y >= 0 && pos.y < 9)
 				{
+					if (pos.x == 3 && pos.y == 0)
+					{
+						System.Console.WriteLine();
+					}
+
+
 					yield return new PotentialMove(pos.x, pos.y, canBreakWalls: true, mustBeEmpty: check.ToArray());
 					check.Add(pos);
 					pos = (pos.x + slDir.x, pos.y + slDir.y);
