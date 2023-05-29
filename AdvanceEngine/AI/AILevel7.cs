@@ -8,27 +8,56 @@ using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.AI
 {
+	/// <summary>
+	/// AI Implemented to Level 7
+	/// </summary>
 	public class AILevel7 : IAdvanceAI
 	{
+		/// <summary>
+		/// AI Model Name
+		/// </summary>
 		public string Name => "AI Level 7";
 
+		/// <summary>
+		/// The AI model used to predict the enemy
+		/// </summary>
 		public IAdvanceAI EnemyPredictor { get; set; }
+
+		/// <summary>
+		/// The AI Model used to forecast future moves for the current player
+		/// </summary>
 		public IAdvanceAI SelfPredictor { get; set; }
 
 		private Random m_Random = new Random();
 
+		/// <summary>
+		/// Ai Level 7
+		/// </summary>
+		/// <param name="predictor">The AI model to use for both friend and foe</param>
 		public AILevel7(IAdvanceAI predictor)
 		{
 			EnemyPredictor = predictor;
 			SelfPredictor = predictor;
 		}
 
+		/// <summary>
+		/// Ai level 7
+		/// </summary>
+		/// <param name="enemyPredictor">The AI model used to predict the enemy</param>
+		/// <param name="selfPredictor">The AI model used to forecast own moves</param>
 		public AILevel7(IAdvanceAI enemyPredictor, IAdvanceAI selfPredictor)
 		{
 			EnemyPredictor = enemyPredictor;
 			SelfPredictor = selfPredictor;
 		}
 
+
+		/// <summary>
+		/// Determiens what move to make if possible
+		/// </summary>
+		/// <param name="pieceMap">Board state</param>
+		/// <param name="team">Playing team</param>
+		/// <returns>The next move to make, if possible</returns>
 		public Move? DetermineMove(IPieceMap pieceMap, ETeam team)
 		{
 			var info = pieceMap.GetBoardInfo(team);
@@ -74,7 +103,6 @@ namespace AdvanceEngine.AI
 						{
 							return move;
 						}
-
 
 						if (move.ScoreChange > currentMax)
 						{
@@ -122,6 +150,13 @@ namespace AdvanceEngine.AI
 			return discriminated[m_Random.Next(discriminated.Length)].move;
 		}
 
+		/// <summary>
+		/// Evaluates the future value of a move
+		/// </summary>
+		/// <param name="baseMap">Initial board state</param>
+		/// <param name="team">The playing side</param>
+		/// <param name="move">The move to forecast</param>
+		/// <returns>The future value of a move, and a preferential discriminator</returns>
 		private (int score, int discriminator) EvaluateFutureValue(IPieceMap baseMap, ETeam team, Move move)
 		{
 			var moves = new List<Move>();

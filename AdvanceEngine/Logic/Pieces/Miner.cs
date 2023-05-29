@@ -6,11 +6,23 @@ using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Logic.Pieces
 {
+	/// <summary>
+	/// Miner Advance Piece
+	/// </summary>
 	[AdvancePiece(value: 4, type: EPieceType.Miner)]
 	public class Miner : Piece
 	{
+		/// <summary>
+		/// Miner
+		/// </summary>
+		/// <param name="team">Initial Team</param>
 		public Miner(ETeam team) : base(team) { }
 
+		/// <summary>
+		/// Converts the piece to another team
+		/// </summary>
+		/// <param name="team">team to convert to</param>
+		/// <returns>A new instance of the peice in the specified team</returns>
 		public override IPiece Convert(ETeam team) => new Miner(team);
 
 		/// <summary>

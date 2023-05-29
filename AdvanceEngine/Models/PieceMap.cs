@@ -22,12 +22,72 @@ namespace AdvanceEngine.Models
 		private readonly IPiece?[,] m_Map;
 
 		/// <summary>
+		/// An iterable collection of all black pieces on the baord
+		/// </summary>
+		public IReadOnlyList<IPiece> BlackPieces { get; }
+
+		/// <summary>
+		/// An iterable collection of all white pieces on the board
+		/// </summary>
+		public IReadOnlyList<IPiece> WhitePieces { get; }
+
+
+		public IPiece BlackGeneral { get; }
+
+		public IPiece WhiteGeneral { get; }
+
+		/// <summary>
 		/// Piece Map
 		/// </summary>
 		/// <param name="map">The board state</param>
 		public PieceMap(IPiece?[,] map)
 		{
 			m_Map = map;
+
+			var black = new List<IPiece>(16);
+			var white = new List<IPiece>(16);
+
+			IPiece? blackGeneral = null;
+			IPiece? whiteGeneral = null;
+
+			IPiece? piece;
+			for(int x = 0; x < 9; x++)
+			{
+				for(int y = 0; y < 9; y++)
+				{
+					piece = map[x, y];
+					if (piece != null)
+					{
+						switch(piece.Team)
+						{
+							case ETeam.Black:
+								black.Add(piece);
+								
+								if (piece is General)
+									blackGeneral = piece;
+								break;
+
+							case ETeam.White:
+								white.Add(piece);
+
+								if (piece is General)
+									whiteGeneral = piece;
+								break;
+						}
+					}
+				}
+			}
+
+			if (blackGeneral == null || whiteGeneral == null)
+			{
+				throw new InvalidOperationException("Invalid board state");
+			}
+
+			BlackGeneral = blackGeneral;
+			WhiteGeneral = whiteGeneral;
+
+			BlackPieces = black.AsReadOnly();
+			WhitePieces = white.AsReadOnly();
 		}
 
 		/// <summary>
@@ -89,7 +149,7 @@ namespace AdvanceEngine.Models
 			{
 				if (IsValidCoordinate(x + p.x, y + p.y))
 				{
-					var piece = GetPieceAtPosition(x + p.x, y + p.y);
+					var piece = m_Map[x + p.x, y + p.y];
 					if (piece != null && piece.Team != attacker && piece is Sentinel)
 					{
 						return true;
