@@ -5,8 +5,16 @@ using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine
 {
+	/// <summary>
+	/// Class providing helper extensions
+	/// </summary>
 	public static class Extensions
 	{
+		/// <summary>
+		/// Gets the enemy for this team
+		/// </summary>
+		/// <param name="team">The playing team</param>
+		/// <returns>The playing team's enemy</returns>
 		public static ETeam Enemy(this ETeam team)
 		{
 			if (team == ETeam.Black)
@@ -20,6 +28,14 @@ namespace AdvanceEngine
 			return ETeam.Neutral;
 		}
 
+		/// <summary>
+		/// Converts a piece map into string representation
+		/// </summary>
+		/// <param name="map">Piece map to save</param>
+		/// <returns>
+		/// String representation of the map that can be read using <seealso cref="Models.Mutators.LoadFromFile(string)"/> 
+		/// or <seealso cref="Models.Mutators.LoadFromData(string[])"/> when split by newlines
+		/// </returns>
 		public static string Save(this IPieceMap map)
 		{
 			var sb = new StringBuilder();

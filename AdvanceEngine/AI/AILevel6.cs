@@ -9,12 +9,25 @@ using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.AI
 {
+	/// <summary>
+	/// Advance AI implemented to AI Level 6
+	/// </summary>
 	public class AILevel6 : IAdvanceAI
 	{
+		/// <summary>
+		/// AI Model Name
+		/// </summary>
 		public string Name => "AI Level 6";
 
 		private Random m_Random = new Random();
 
+		/// <summary>
+		/// Determines what move to make next, if possible.
+		/// </summary>
+		/// <param name="pieceMap">Current board state</param>
+		/// <param name="team">Playing side</param>
+		/// <returns>The next move to make, if possible</returns>
+		/// <exception cref="CheckmatedException">Raised when the current player is checkmated</exception>
 		public Move? DetermineMove(IPieceMap pieceMap, ETeam team)
 		{
 			var state = pieceMap.CheckState(team);
@@ -68,9 +81,10 @@ namespace AdvanceEngine.AI
 				}
 			}
 
-
 			if (goodMoves.Count == 0)
+			{
 				goodMoves = badMoves;
+			}
 
 			if (goodMoves.Count == 0)
 			{
@@ -95,29 +109,13 @@ namespace AdvanceEngine.AI
 			return maxed[m_Random.Next(maxed.Length)].move;
 		}
 
-
-		private Move? CheckMove(IPieceMap map, ETeam team, Move? move)
-		{
-			if (move != null)
-			{
-				var mutated = map.Mutate(move);
-				var info = mutated.GetBoardInfo(team);
-				var danger = mutated.CheckForDanger(info.Self.X, info.Self.Y, info.Self.Piece) != null;
-
-				if (danger)
-				{
-					throw new InvalidOperationException();
-				}
-
-				return move;
-
-			}
-			else
-			{
-				return null;
-			}
-		}
-
+		/// <summary>
+		/// Determines what move to make when the player is in check
+		/// </summary>
+		/// <param name="pieceMap">The board state</param>
+		/// <param name="team">Currently playing side</param>
+		/// <returns>The next move to make, if possible</returns>
+		/// <exception cref="CheckmatedException">Raised when the current side is checkmated, and cannot move</exception>
 		private Move? DetermineMoveCheck(IPieceMap pieceMap, ETeam team)
 		{
 			var info = pieceMap.GetBoardInfo(team);
@@ -149,7 +147,6 @@ namespace AdvanceEngine.AI
 			}
 
 			return allMoves.OrderByDescending(x => x.ScoreChange).FirstOrDefault();
-
 		}
 	}
 }

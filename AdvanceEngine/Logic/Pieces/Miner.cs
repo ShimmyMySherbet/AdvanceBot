@@ -13,6 +13,13 @@ namespace AdvanceEngine.Logic.Pieces
 
 		public override IPiece Convert(ETeam team) => new Miner(team);
 
+		/// <summary>
+		/// Defines potential moves for this piece
+		/// </summary>
+		/// <param name="x">Piece X coordinate</param>
+		/// <param name="y">Piece Y coordinate</param>
+		/// <param name="dir">Direction multiplier. 1 when White, and -1 when Black</param>
+		/// <returns>An enumeration of potential moves</returns>
 		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, int dir)
 		{
 

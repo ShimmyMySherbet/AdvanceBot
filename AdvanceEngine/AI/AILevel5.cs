@@ -3,17 +3,29 @@ using System.Collections.Generic;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
 using AdvanceEngine.Models.Enums;
-using AdvanceEngine.Models.Exceptions;
 using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.AI
 {
+	/// <summary>
+	/// Advance AI implemented to AI Level 5
+	/// </summary>
 	public class AILevel5 : IAdvanceAI
 	{
+		/// <summary>
+		/// AI Model Name
+		/// </summary>
 		public string Name => "AI Level 5";
 
 		private Random m_Random = new Random();
 
+		/// <summary>
+		/// determines what move to make, if possible
+		/// </summary>
+		/// <param name="pieceMap">Board state</param>
+		/// <param name="team">Playing side</param>
+		/// <returns>The next move to make, if possible</returns>
+		/// <exception cref="InvalidOperationException">Raised when the current player is checkmated</exception>
 		public Move? DetermineMove(IPieceMap pieceMap, ETeam team)
 		{
 			var enemy = new List<(int x, int y, IPiece piece)>();
@@ -100,46 +112,6 @@ namespace AdvanceEngine.AI
 
 			// no possible moves
 			return null;
-		}
-
-		private Move? DetermineMoveChecked(IPieceMap pieceMap, ETeam team, List<(int x, int y, IPiece piece)> friendly, List<(int x, int y, IPiece piece)> enemy, (int x, int y, IPiece piece) self)
-		{
-			// need to get out of check!
-
-			foreach (var a in friendly)
-			{
-				using (var moves = a.piece.GetMoves(a.x, a.y, pieceMap))
-				{
-					while (moves.MoveNext())
-					{
-						var move = moves.Current;
-						if (a.piece is General)
-						{
-							// General cannot make move that puts it in danger, no need to check
-
-							var attackord = pieceMap.CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, a.piece, move);
-							if (attackord != null)
-							{
-								return move;
-							}
-							continue;
-						}
-
-						var mutated = pieceMap.Mutate(move);
-						var attackor = mutated.CheckForDanger(self.x, self.y, self.piece);
-
-						if (attackor == null)
-						{
-							// move neutralizes threat
-							return move;
-						}
-					}
-				}
-			}
-
-			// Checkmated
-			throw new CheckmatedException(team);
-
 		}
 	}
 }

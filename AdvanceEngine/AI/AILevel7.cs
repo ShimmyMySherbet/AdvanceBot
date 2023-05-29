@@ -84,6 +84,10 @@ namespace AdvanceEngine.AI
 						}
 						else if (move.ScoreChange == currentMax)
 						{
+							if (move.MoveType == EMoveType.Attack)
+							{
+								Console.WriteLine();
+							}
 							bestMoves.Add(move);
 						}
 					}

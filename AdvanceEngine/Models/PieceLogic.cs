@@ -5,6 +5,9 @@ using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Models
 {
+	/// <summary>
+	/// An inheritable class providing common definitions and functionality for pieces and piece logic
+	/// </summary>
 	public abstract partial class Piece : IPiece
 	{
 		/// <summary>
@@ -234,53 +237,13 @@ namespace AdvanceEngine.Models
 
 			foreach (var move in mustBeEmpty)
 			{
-				if (map.IsOcupied(move.x, move.y))
+				if (map.IsOccupied(move.x, move.y))
 				{
 					return false;
 				}
 			}
 
 			return true;
-		}
-
-		public bool IsLockedByEnemy(int x, int y, IPieceMap map)
-		{
-			var dir = Team == ETeam.White ? -1 : 1;
-			using (var definitions = GetMoveDefinitions(x, y, dir))
-			{
-				while (definitions.MoveNext())
-				{
-					var move = definitions.Current;
-
-					if (!map.IsValidCoordinate(move.TargetX, move.TargetY))
-					{
-						continue;
-					}
-
-
-					var occupier = map.GetPieceAtPosition(move.TargetX, move.TargetY);
-
-					if (occupier != null && occupier.Team != Team)
-					{
-						continue;
-					}
-
-
-					if (!CheckSpaces(move.MustBeEmpty, map))
-					{
-						continue;
-					}
-
-
-					if (map.CheckForDanger(move.TargetX, move.TargetY, this) == null)
-					{
-						return false;
-					}
-				}
-			}
-
-			return true;
-
 		}
 	}
 }

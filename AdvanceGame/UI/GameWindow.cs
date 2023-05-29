@@ -96,7 +96,7 @@ namespace AdvanceGame.UI
 				return;
 			}
 
-			if (Map.IsOcupied(sqX, sqY))
+			if (Map.IsOccupied(sqX, sqY))
 			{
 				m_Renderer.SelectedPiece = (sqX, sqY);
 			}

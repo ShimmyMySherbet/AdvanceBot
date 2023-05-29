@@ -1,8 +1,18 @@
 ﻿namespace AdvanceEngine.Models
 {
+	/// <summary>
+	/// A Potential Move definition for a piece
+	/// </summary>
 	public struct PotentialMove
 	{
+		/// <summary>
+		/// Target X Coordinate
+		/// </summary>
 		public int TargetX { get; }
+
+		/// <summary>
+		/// Target Y Coordinate
+		/// </summary>
 		public int TargetY { get; }
 
 		/// <summary>
@@ -51,6 +61,20 @@
 		/// </summary>
 		public bool MustNotBeCaptured { get; } = false;
 
+		/// <summary>
+		/// Creates a new instance of a potential move
+		/// </summary>
+		/// <param name="x">Target X Coordinate</param>
+		/// <param name="y">Target Y Coordinate</param>
+		/// <param name="canMove">Flag specifying if the piece can move</param>
+		/// <param name="canAttack">Flag specifying if the peice can attack</param>
+		/// <param name="movesOnAttack">Flag specifying if the piece moves to the target coordinates on attack</param>
+		/// <param name="isBuildMove">Flag specifying this move places a wall</param>
+		/// <param name="swapsPlaces">Flag specifying this piece can swap places with the target piece on move</param>
+		/// <param name="convertsEnemy">Flag specifying if this move converts the enemy on attack</param>
+		/// <param name="canBreakWalls">Flag specifying if this attack can target walls</param>
+		/// <param name="mustNotBeCaptured">Flag specifying that this piece cannot put itself in danger</param>
+		/// <param name="mustBeEmpty">List of coordinates that must not be occupied for this move to be valid</param>
 		public PotentialMove(int x, int y, bool canMove = true, bool canAttack = true, bool movesOnAttack = true, bool isBuildMove = false,
 			bool swapsPlaces = false ,bool convertsEnemy = false , bool canBreakWalls = false, bool mustNotBeCaptured = false, params (int x, int y)[]? mustBeEmpty)
 		{

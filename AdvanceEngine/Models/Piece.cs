@@ -6,12 +6,29 @@ using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Models
 {
+	/// <summary>
+	/// Base class providing metadata for a piece
+	/// </summary>
 	public abstract partial class Piece : IPiece
 	{
+		/// <summary>
+		/// Piece score value
+		/// </summary>
 		public int ScoreValue { get; }
+
+		/// <summary>
+		/// The piece type
+		/// </summary>
 		public EPieceType PieceType { get; }
 
+		/// <summary>
+		/// The team the piece is on
+		/// </summary>
 		public ETeam Team { get; }
+
+		/// <summary>
+		/// A flag specifying if the piece can be converted to another team
+		/// </summary>
 		public bool Convertable { get; } = true;
 
 		/// <summary>
@@ -52,8 +69,17 @@ namespace AdvanceEngine.Models
 			Team = team;
 		}
 
+		/// <summary>
+		/// Definition to convert the piece to another team
+		/// </summary>
+		/// <param name="team">Team to convert to</param>
+		/// <returns>A new instance of the peice</returns>
 		public abstract IPiece Convert(ETeam team);
 
+		/// <summary>
+		/// Provides a human-readable view of the piece for debugging
+		/// </summary>
+		/// <returns>Human readable representation</returns>
 		public override string ToString()
 		{
 			return $"{Team} {PieceType}";
