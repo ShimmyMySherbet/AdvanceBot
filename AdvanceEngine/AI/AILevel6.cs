@@ -48,7 +48,7 @@ namespace AdvanceEngine.AI
 			var badMoves = new List<(Move move, ECheckState enemyState)>();
 			foreach (var piece in info.Friendly)
 			{
-				using (var moves = piece.Piece.GetMoves(piece.X, piece.Y, pieceMap))
+				using (var moves = piece.GetMoves(pieceMap))
 				{
 					while (moves.MoveNext())
 					{
@@ -123,7 +123,7 @@ namespace AdvanceEngine.AI
 			var allMoves = new List<Move>();
 			foreach (var piece in info.Friendly)
 			{
-				using (var moves = piece.Piece.GetMoves(piece.X, piece.Y, pieceMap))
+				using (var moves = piece.GetMoves(pieceMap))
 				{
 					while (moves.MoveNext())
 					{

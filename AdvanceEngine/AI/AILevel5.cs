@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
 using AdvanceEngine.Models.Enums;
@@ -78,11 +79,14 @@ namespace AdvanceEngine.AI
 			foreach (var piece in friendly)
 			{
 
-				using (var moves = piece.piece.GetMoves(piece.x, piece.y, pieceMap))
+				using (var moves = piece.piece.GetMoves(pieceMap))
 				{
 					while (moves.MoveNext())
 					{
 						var move = moves.Current;
+
+						if (move.TargetPiece == EPieceType.General)
+							continue; // bad board state
 
 						var mutated = pieceMap.Mutate(move);
 

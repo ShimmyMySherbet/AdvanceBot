@@ -19,6 +19,16 @@ namespace AdvanceEngine.Models.Interfaces
 		public ETeam Team { get; }
 
 		/// <summary>
+		/// The piece X-Coordinate
+		/// </summary>
+		public int X { get; }
+
+		/// <summary>
+		/// The piece Y-Coordinate
+		/// </summary>
+		public int Y { get; }
+
+		/// <summary>
 		/// The type of the piece
 		/// </summary>
 		public EPieceType PieceType { get; }
@@ -38,13 +48,15 @@ namespace AdvanceEngine.Models.Interfaces
 		/// <param name="filterY">Filters to only moves targeting this Y Coordinate, or -1 for no filtering</param>
 		/// <param name="ignoreSafety">Specifies pieces that cannot move to an unsafe location should ignore safety requirements</param>
 		/// <returns>An enumeration of possible moves if any</returns>
-		public IEnumerator<Move> GetMoves(int x, int y, IPieceMap map, int filterX = -1, int filyerY = -1, bool ignoreSafety = false);
+		public IEnumerator<Move> GetMoves(IPieceMap map, int filterX = -1, int filyerY = -1, bool ignoreSafety = false);
 
 		/// <summary>
 		/// Converts the piece to another team
 		/// </summary>
 		/// <param name="team">Team to convert to</param>
+		/// <param name="x">New X Coordinate</param>
+		/// <param name="y">New Y Coordinate</param>
 		/// <returns>A new instance of the piece as the specified team</returns>
-		public IPiece Convert(ETeam team);
+		public IPiece Mutate(ETeam team, int x, int y);
 	}
 }

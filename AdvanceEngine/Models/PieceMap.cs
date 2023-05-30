@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
@@ -14,7 +15,7 @@ namespace AdvanceEngine.Models
 		/// <summary>
 		/// Creates a default empty piece map
 		/// </summary>
-		public static PieceMap Default => new PieceMap(new IPiece?[9, 9]);
+		public static PieceMap Default => new PieceMap(new IPiece?[9, 9], dontValidate: true);
 
 		/// <summary>
 		/// Stores a 2D array that represents the positions of pieces on the board. Provides fast locational lookups of the board's state
@@ -31,60 +32,59 @@ namespace AdvanceEngine.Models
 		/// </summary>
 		public IReadOnlyList<IPiece> WhitePieces { get; }
 
+		/// <summary>
+		/// The black general, if present on board
+		/// </summary>
+		public IPiece? BlackGeneral { get; } = null;
 
-		public IPiece BlackGeneral { get; }
-
-		public IPiece WhiteGeneral { get; }
+		/// <summary>
+		/// The white general, if present on board
+		/// </summary>
+		public IPiece? WhiteGeneral { get; } = null;
 
 		/// <summary>
 		/// Piece Map
 		/// </summary>
 		/// <param name="map">The board state</param>
-		public PieceMap(IPiece?[,] map)
+		public PieceMap(IPiece?[,] map, bool dontValidate = true)
 		{
 			m_Map = map;
 
 			var black = new List<IPiece>(16);
 			var white = new List<IPiece>(16);
 
-			IPiece? blackGeneral = null;
-			IPiece? whiteGeneral = null;
-
 			IPiece? piece;
-			for(int x = 0; x < 9; x++)
+			for (int x = 0; x < 9; x++)
 			{
-				for(int y = 0; y < 9; y++)
+				for (int y = 0; y < 9; y++)
 				{
 					piece = map[x, y];
 					if (piece != null)
 					{
-						switch(piece.Team)
+						switch (piece.Team)
 						{
 							case ETeam.Black:
 								black.Add(piece);
-								
+
 								if (piece is General)
-									blackGeneral = piece;
+									BlackGeneral = piece;
 								break;
 
 							case ETeam.White:
 								white.Add(piece);
 
 								if (piece is General)
-									whiteGeneral = piece;
+									WhiteGeneral = piece;
 								break;
 						}
 					}
 				}
 			}
 
-			if (blackGeneral == null || whiteGeneral == null)
+			if (!dontValidate && (BlackGeneral == null || WhiteGeneral == null))
 			{
-				throw new InvalidOperationException("Invalid board state");
+				throw new InvalidOperationException("Invalid Board State");
 			}
-
-			BlackGeneral = blackGeneral;
-			WhiteGeneral = whiteGeneral;
 
 			BlackPieces = black.AsReadOnly();
 			WhitePieces = white.AsReadOnly();
@@ -164,7 +164,7 @@ namespace AdvanceEngine.Models
 		/// </summary>
 		/// <param name="mutator">Mutator to apply</param>
 		/// <returns>A new instance of the board with the mutator applied</returns>
-		public IPieceMap Mutate(MapMutator mutator)
+		public IPieceMap Mutate(MapMutator mutator, bool dontValidate = false)
 		{
 			// Clone the map
 			var newMap = new IPiece?[9, 9];
@@ -173,7 +173,7 @@ namespace AdvanceEngine.Models
 			// Mutate the new 2D map to represent the move
 			mutator(newMap);
 
-			return new PieceMap(newMap);
+			return new PieceMap(newMap, dontValidate);
 		}
 
 		/// <summary>
@@ -186,27 +186,19 @@ namespace AdvanceEngine.Models
 		/// <returns>The piece threatening the location, or <see langword="null"/> if it is safe</returns>
 		public IPiece? CheckForDanger(int x, int y, IPiece piece, Move? move = null)
 		{
-
 			var mutated = move != null ? Mutate(move) : this;
 
-			for (int locX = 0; locX < 9; locX++)
+			foreach (var enemy in mutated.EnemyPieces(piece.Team))
 			{
-				for (int locY = 0; locY < 9; locY++)
+				using (var enemyMoves = enemy.GetMoves(mutated, x, y, true))
 				{
-					var lookupPiece = mutated.GetPieceAtPosition(locX, locY);
-
-					if (lookupPiece != null && lookupPiece.Team == piece.Team.Enemy())
+					while (enemyMoves.MoveNext())
 					{
-						using (var enemyMoves = lookupPiece.GetMoves(locX, locY, mutated, x, y, true))
-						{
-							while (enemyMoves.MoveNext())
-							{
-								return lookupPiece;
-							}
-						}
+						return enemy;
 					}
 				}
 			}
+
 			return null;
 		}
 
@@ -219,19 +211,26 @@ namespace AdvanceEngine.Models
 		{
 			var info = GetBoardInfo(team);
 
-			var inDanger = CheckForDanger(info.Self.X, info.Self.Y, info.Self.Piece) != null;
+			var inDanger = CheckForDanger(info.Self.X, info.Self.Y, info.Self) != null;
 
 			foreach (var friendly in info.Friendly)
 			{
-				using (var moves = friendly.Piece.GetMoves(friendly.X, friendly.Y, this))
+				using (var moves = friendly.GetMoves(this))
 				{
 					while (moves.MoveNext())
 					{
 						var move = moves.Current;
+
+						if (move.TargetPiece == EPieceType.General)
+						{
+							// edge case: enemy is in check
+							continue;
+						}
+
 						var mutated = Mutate(move);
 						var subInfo = mutated.GetBoardInfo(team);
 
-						if (mutated.CheckForDanger(subInfo.Self.X, subInfo.Self.Y, subInfo.Self.Piece) == null)
+						if (mutated.CheckForDanger(subInfo.Self.X, subInfo.Self.Y, subInfo.Self) == null)
 						{
 							// can make a move that is safe
 
@@ -255,48 +254,19 @@ namespace AdvanceEngine.Models
 		/// <returns>Board info for this board</returns>
 		public BoardInfo GetBoardInfo(ETeam team)
 		{
-			PieceInfo? self = null;
-			PieceInfo? opponent = null;
-
-			var friendly = new List<PieceInfo>();
-			var hostile = new List<PieceInfo>();
-
-			for (int x = 0; x < 9; x++)
-			{
-				for (int y = 0; y < 9; y++)
-				{
-					var piece = GetPieceAtPosition(x, y);
-					if (piece != null)
-					{
-						if (piece.Team == ETeam.Neutral)
-							continue;
-
-						if (piece.Team == team)
-						{
-							friendly.Add(new PieceInfo(x, y, piece));
-
-							if (piece is General)
-							{
-								self = new PieceInfo(x, y, piece);
-							}
-						}
-						else
-						{
-							hostile.Add(new PieceInfo(x, y, piece));
-							if (piece is General)
-							{
-								opponent = new PieceInfo(x, y, piece);
-							}
-						}
-					}
-				}
-			}
-
-			if (self == null || opponent == null)
+			if (WhiteGeneral == null || BlackGeneral == null)
 			{
 				throw new InvalidOperationException("Invalid board state");
 			}
-			return new BoardInfo(self.Value, opponent.Value, friendly, hostile);
+
+			if (team == ETeam.White)
+			{
+				return new BoardInfo(WhiteGeneral, BlackGeneral, WhitePieces, BlackPieces);
+			}
+			else
+			{
+				return new BoardInfo(BlackGeneral, WhiteGeneral, BlackPieces, WhitePieces);
+			}
 		}
 
 		/// <summary>
@@ -306,19 +276,7 @@ namespace AdvanceEngine.Models
 		/// <returns>The total score value of a team</returns>
 		public int GetTeamValue(ETeam team)
 		{
-			var value = 0;
-			for (int x = 0; x < 9; x++)
-			{
-				for (int y = 0; y < 9; y++)
-				{
-					var piece = m_Map[x, y];
-					if (piece != null && piece.Team == team)
-					{
-						value += piece.ScoreValue;
-					}
-				}
-			}
-			return value;
+			return this.FriendlyPieces(team).Sum(x => x.ScoreValue);
 		}
 
 		/// <summary>
@@ -328,26 +286,7 @@ namespace AdvanceEngine.Models
 		/// <returns>The score difference. Positive indicating the team is winning</returns>
 		public int GetTeamLead(ETeam team)
 		{
-			var value = 0;
-			for (int x = 0; x < 9; x++)
-			{
-				for (int y = 0; y < 9; y++)
-				{
-					var piece = m_Map[x, y];
-					if (piece != null)
-					{
-						if (piece.Team == team)
-						{
-							value += piece.ScoreValue;
-						}
-						else
-						{
-							value -= piece.ScoreValue;
-						}
-					}
-				}
-			}
-			return value;
+			return GetTeamValue(team) - GetTeamValue(team.Enemy());
 		}
 	}
 }

@@ -66,7 +66,7 @@ namespace AdvanceGame
 
 					if (highlightTarget != null)
 					{
-						using (var moves = highlightTarget.GetMoves(SelectedPiece.x, SelectedPiece.y, map))
+						using (var moves = highlightTarget.GetMoves(map))
 						{
 							while (moves.MoveNext())
 							{

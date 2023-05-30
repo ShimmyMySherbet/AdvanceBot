@@ -30,6 +30,8 @@
 		{
 			this.pngRender = new System.Windows.Forms.PictureBox();
 			this.gbTeam = new System.Windows.Forms.GroupBox();
+			this.btnDebugBlack = new System.Windows.Forms.Button();
+			this.btnDebugWhite = new System.Windows.Forms.Button();
 			this.button3 = new System.Windows.Forms.Button();
 			this.btnSave = new System.Windows.Forms.Button();
 			this.btnLoad = new System.Windows.Forms.Button();
@@ -51,7 +53,7 @@
 			this.btnSelectBlack = new System.Windows.Forms.Button();
 			this.lblBlack = new System.Windows.Forms.Label();
 			this.cbBlackAI = new System.Windows.Forms.CheckBox();
-			this.btnDebug = new System.Windows.Forms.Button();
+			this.cbAutoPlay = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.pngRender)).BeginInit();
 			this.gbTeam.SuspendLayout();
 			this.gbWhite.SuspendLayout();
@@ -69,7 +71,9 @@
 			// 
 			// gbTeam
 			// 
-			this.gbTeam.Controls.Add(this.btnDebug);
+			this.gbTeam.Controls.Add(this.cbAutoPlay);
+			this.gbTeam.Controls.Add(this.btnDebugBlack);
+			this.gbTeam.Controls.Add(this.btnDebugWhite);
 			this.gbTeam.Controls.Add(this.button3);
 			this.gbTeam.Controls.Add(this.btnSave);
 			this.gbTeam.Controls.Add(this.btnLoad);
@@ -80,10 +84,34 @@
 			this.gbTeam.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.gbTeam.Location = new System.Drawing.Point(718, 23);
 			this.gbTeam.Name = "gbTeam";
-			this.gbTeam.Size = new System.Drawing.Size(262, 224);
+			this.gbTeam.Size = new System.Drawing.Size(262, 251);
 			this.gbTeam.TabIndex = 1;
 			this.gbTeam.TabStop = false;
 			this.gbTeam.Text = "Game";
+			// 
+			// btnDebugBlack
+			// 
+			this.btnDebugBlack.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.btnDebugBlack.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.btnDebugBlack.Location = new System.Drawing.Point(131, 178);
+			this.btnDebugBlack.Name = "btnDebugBlack";
+			this.btnDebugBlack.Size = new System.Drawing.Size(121, 31);
+			this.btnDebugBlack.TabIndex = 8;
+			this.btnDebugBlack.Text = "Debug Black";
+			this.btnDebugBlack.UseVisualStyleBackColor = true;
+			this.btnDebugBlack.Click += new System.EventHandler(this.btnDebugBlack_Click);
+			// 
+			// btnDebugWhite
+			// 
+			this.btnDebugWhite.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.btnDebugWhite.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+			this.btnDebugWhite.Location = new System.Drawing.Point(6, 178);
+			this.btnDebugWhite.Name = "btnDebugWhite";
+			this.btnDebugWhite.Size = new System.Drawing.Size(121, 31);
+			this.btnDebugWhite.TabIndex = 7;
+			this.btnDebugWhite.Text = "Debug White";
+			this.btnDebugWhite.UseVisualStyleBackColor = true;
+			this.btnDebugWhite.Click += new System.EventHandler(this.btnDebug_Click);
 			// 
 			// button3
 			// 
@@ -169,7 +197,7 @@
 			this.gbWhite.Controls.Add(this.lblWhiteAI);
 			this.gbWhite.Controls.Add(this.cbWhiteAI);
 			this.gbWhite.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.gbWhite.Location = new System.Drawing.Point(718, 253);
+			this.gbWhite.Location = new System.Drawing.Point(718, 280);
 			this.gbWhite.Name = "gbWhite";
 			this.gbWhite.Size = new System.Drawing.Size(262, 136);
 			this.gbWhite.TabIndex = 2;
@@ -248,7 +276,7 @@
 			this.gbBlack.Controls.Add(this.lblBlack);
 			this.gbBlack.Controls.Add(this.cbBlackAI);
 			this.gbBlack.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.gbBlack.Location = new System.Drawing.Point(718, 395);
+			this.gbBlack.Location = new System.Drawing.Point(718, 432);
 			this.gbBlack.Name = "gbBlack";
 			this.gbBlack.Size = new System.Drawing.Size(262, 132);
 			this.gbBlack.TabIndex = 4;
@@ -318,17 +346,16 @@
 			this.cbBlackAI.UseVisualStyleBackColor = true;
 			this.cbBlackAI.CheckedChanged += new System.EventHandler(this.cbBlackAI_CheckedChanged);
 			// 
-			// btnDebug
+			// cbAutoPlay
 			// 
-			this.btnDebug.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.btnDebug.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.btnDebug.Location = new System.Drawing.Point(6, 178);
-			this.btnDebug.Name = "btnDebug";
-			this.btnDebug.Size = new System.Drawing.Size(121, 31);
-			this.btnDebug.TabIndex = 7;
-			this.btnDebug.Text = "Debug";
-			this.btnDebug.UseVisualStyleBackColor = true;
-			this.btnDebug.Click += new System.EventHandler(this.btnDebug_Click);
+			this.cbAutoPlay.AutoSize = true;
+			this.cbAutoPlay.Location = new System.Drawing.Point(7, 215);
+			this.cbAutoPlay.Name = "cbAutoPlay";
+			this.cbAutoPlay.Size = new System.Drawing.Size(95, 25);
+			this.cbAutoPlay.TabIndex = 9;
+			this.cbAutoPlay.Text = "Auto Play";
+			this.cbAutoPlay.UseVisualStyleBackColor = true;
+			this.cbAutoPlay.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
 			// 
 			// GameWindow
 			// 
@@ -377,6 +404,8 @@
 		private Button btnSave;
 		private Button btnRunMove;
 		private Button button2;
-		private Button btnDebug;
+		private Button btnDebugWhite;
+		private Button btnDebugBlack;
+		private CheckBox cbAutoPlay;
 	}
 }

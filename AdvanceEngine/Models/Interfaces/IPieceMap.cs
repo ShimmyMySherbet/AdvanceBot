@@ -1,4 +1,5 @@
-﻿using AdvanceEngine.Models.Enums;
+﻿using System.Collections.Generic;
+using AdvanceEngine.Models.Enums;
 
 namespace AdvanceEngine.Models.Interfaces
 {
@@ -7,6 +8,26 @@ namespace AdvanceEngine.Models.Interfaces
 	/// </summary>
 	public interface IPieceMap
 	{
+		/// <summary>
+		/// An iterable collection of all black pieces on the baord
+		/// </summary>
+		public IReadOnlyList<IPiece> BlackPieces { get; }
+
+		/// <summary>
+		/// An iterable collection of all white pieces on the board
+		/// </summary>
+		public IReadOnlyList<IPiece> WhitePieces { get; }
+
+		/// <summary>
+		/// The black general, if present on board
+		/// </summary>
+		public IPiece? BlackGeneral { get; }
+
+		/// <summary>
+		/// The white general, if present on board
+		/// </summary>
+		public IPiece? WhiteGeneral { get; }
+
 		/// <summary>
 		/// Tests if a coordinate is valid on the board
 		/// </summary>
@@ -52,7 +73,7 @@ namespace AdvanceEngine.Models.Interfaces
 		/// </summary>
 		/// <param name="mutator">The mutator to use</param>
 		/// <returns>A new instance of the map with the changes from the mutator</returns>
-		IPieceMap Mutate(MapMutator mutator);
+		IPieceMap Mutate(MapMutator mutator, bool dontValidate = false);
 
 		/// <summary>
 		/// Checks if a piece at a position is in danger

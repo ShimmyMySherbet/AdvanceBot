@@ -30,7 +30,7 @@ namespace AdvanceEngine.AI
 		{
 			var info = pieceMap.GetBoardInfo(team);
 
-			var threat = pieceMap.CheckForDanger(info.Self.X, info.Self.Y, info.Self.Piece);
+			var threat = pieceMap.CheckForDanger(info.Self.X, info.Self.Y, info.Self);
 			if (threat != null)
 			{
 				return DetermineMoveChecked(pieceMap, team, info);
@@ -39,7 +39,7 @@ namespace AdvanceEngine.AI
 			var moveList = new List<Move>();
 			foreach (var friendly in info.Friendly)
 			{
-				using (var moves = friendly.Piece.GetMoves(friendly.X, friendly.Y, pieceMap))
+				using (var moves = friendly.GetMoves(pieceMap))
 				{
 					while (moves.MoveNext())
 					{
@@ -54,7 +54,7 @@ namespace AdvanceEngine.AI
 
 				var mutated = pieceMap.Mutate(moveList[indIndex]);
 				var mutatedInfo = mutated.GetBoardInfo(team);
-				if (mutated.CheckForDanger(mutatedInfo.Self.X, mutatedInfo.Self.Y, mutatedInfo.Self.Piece) != null)
+				if (mutated.CheckForDanger(mutatedInfo.Self.X, mutatedInfo.Self.Y, mutatedInfo.Self) != null)
 				{
 					moveList.RemoveAt(indIndex);
 				}
@@ -77,16 +77,16 @@ namespace AdvanceEngine.AI
 		{
 			foreach (var friendly in info.Friendly)
 			{
-				using (var moves = friendly.Piece.GetMoves(friendly.X, friendly.Y, map))
+				using (var moves = friendly.GetMoves(map))
 				{
 					while (moves.MoveNext())
 					{
 						var move = moves.Current;
-						if (friendly.Piece is General)
+						if (friendly is General)
 						{
 							// General cannot make move that puts it in danger, no need to check
 
-							var attackord = map.CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, friendly.Piece, move);
+							var attackord = map.CheckForDanger(move.TargetPosition?.x ?? 0, move.TargetPosition?.y ?? 0, friendly, move);
 							if (attackord == null)
 							{
 								return move;
@@ -95,7 +95,7 @@ namespace AdvanceEngine.AI
 						}
 
 						var mutated = map.Mutate(move);
-						var attackor = mutated.CheckForDanger(info.Self.X, info.Self.Y, info.Self.Piece, move);
+						var attackor = mutated.CheckForDanger(info.Self.X, info.Self.Y, info.Self, move);
 
 						if (attackor == null)
 						{

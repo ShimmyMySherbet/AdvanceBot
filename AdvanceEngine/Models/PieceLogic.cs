@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
@@ -15,9 +16,9 @@ namespace AdvanceEngine.Models
 		/// </summary>
 		/// <param name="x">Piece X coordinate</param>
 		/// <param name="y">Piece Y coordinate</param>
-		/// <param name="dir">a value 1 or -1. Where 1 represents White, and -1 represents Black.</param>
+		/// <param name="team">The team of the playing piece</param>
 		/// <returns>An enumeration of potential moves with no move validation.</returns>
-		public abstract IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, int dir);
+		public abstract IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, ETeam team);
 
 		/// <summary>
 		/// Determines all the moves the piece can make
@@ -28,17 +29,10 @@ namespace AdvanceEngine.Models
 		/// <param name="filterX">Filters moves to only ones targeting positions with the specified X value</param>
 		/// <param name="filterY">Filters moves to only ones targeting positions with the specified Y value</param>
 		/// <returns>An enumeration of possible moves, with their board mutator</returns>
-		public virtual IEnumerator<Move> GetMoves(int x, int y, IPieceMap map, int filterX = -1, int filterY = -1, bool ignoreSafety = false)
+		[MethodImpl(methodImplOptions: MethodImplOptions.AggressiveOptimization)]
+		public virtual IEnumerator<Move> GetMoves(IPieceMap map, int filterX = -1, int filterY = -1, bool ignoreSafety = false)
 		{
-			var dir = Team == ETeam.White ? -1 : 1;
-			var self = map.GetPieceAtPosition(x, y);
-
-			if (PieceType == EPieceType.Miner)
-			{
-				System.Console.WriteLine();
-			}
-
-			using (var moves = GetMoveDefinitions(x, y, dir))
+			using (var moves = GetMoveDefinitions(X, Y, Team))
 			{
 				while (moves.MoveNext())
 				{
@@ -67,12 +61,12 @@ namespace AdvanceEngine.Models
 						{
 							MapMutator mutator = (IPiece?[,] map) =>
 							{
-								map[current.TargetX, current.TargetY] = self;
-								map[x, y] = target;
+								map[current.TargetX, current.TargetY] = Mutate(Team, current.TargetX, current.TargetY);
+								map[X, Y] = target.Mutate(target.Team, X, Y);
 							};
-							yield return new Move(0, 0, mutator, EMoveType.Move, self, current)
+							yield return new Move(0, 0, mutator, EMoveType.Move, this, current)
 							{
-								Origin = (x, y),
+								Origin = (X, Y),
 								TargetPosition = (current.TargetX, current.TargetY),
 								TargetPiece = target.PieceType
 							};
@@ -119,14 +113,14 @@ namespace AdvanceEngine.Models
 						{
 							if (current.ConvertsEnemy)
 							{
-								map[current.TargetX, current.TargetY] = target.Convert(Team);
+								map[current.TargetX, current.TargetY] = target.Mutate(Team, target.X, target.Y);
 								return;
 							}
 
 							if (current.MovesOnAttack)
 							{
-								map[current.TargetX, current.TargetY] = self;
-								map[x, y] = null;
+								map[current.TargetX, current.TargetY] = Mutate(Team, current.TargetX, current.TargetY);
+								map[X, Y] = null;
 								return;
 							}
 
@@ -135,7 +129,9 @@ namespace AdvanceEngine.Models
 
 						if (!ignoreSafety && current.MustNotBeCaptured)
 						{
-							var newBoard = map.Mutate(attackMutator);
+							// Since this move could knock an enemy general off the board, we have to disable validation.
+							// This move can't actually be played, since it will be detected as check or checkmate
+							var newBoard = map.Mutate(attackMutator, dontValidate: true);
 							var danger = newBoard.CheckForDanger(current.TargetX, current.TargetY, this);
 							if (danger != null)
 							{
@@ -146,9 +142,9 @@ namespace AdvanceEngine.Models
 
 						var ownScore = current.ConvertsEnemy ? target.ScoreValue : 0;
 
-						yield return new Move(ownScore, target.ScoreValue * -1, attackMutator, current.ConvertsEnemy ? EMoveType.Convert : EMoveType.Attack, self, current)
+						yield return new Move(ownScore, target.ScoreValue * -1, attackMutator, current.ConvertsEnemy ? EMoveType.Convert : EMoveType.Attack, this, current)
 						{
-							Origin = (x, y),
+							Origin = (X, Y),
 							TargetPiece = target.PieceType,
 							TargetPosition = (current.TargetX, current.TargetY)
 						};
@@ -166,7 +162,7 @@ namespace AdvanceEngine.Models
 
 						MapMutator mutator = (IPiece?[,] map) =>
 						{
-							map[current.TargetX, current.TargetY] = new Wall();
+							map[current.TargetX, current.TargetY] = new Wall(current.TargetX, current.TargetY);
 						};
 
 						if (!ignoreSafety && current.MustNotBeCaptured)
@@ -180,9 +176,9 @@ namespace AdvanceEngine.Models
 							}
 						}
 
-						yield return new Move(0, 0, mutator, EMoveType.Build, self, current)
+						yield return new Move(0, 0, mutator, EMoveType.Build, this, current)
 						{
-							Origin = (x, y),
+							Origin = (X, Y),
 							TargetPosition = (current.TargetX, current.TargetY)
 						};
 						continue;
@@ -197,8 +193,8 @@ namespace AdvanceEngine.Models
 
 					MapMutator moveMutator = (IPiece?[,] map) =>
 					{
-						map[x, y] = null;
-						map[current.TargetX, current.TargetY] = self;
+						map[X, Y] = null;
+						map[current.TargetX, current.TargetY] = Mutate(Team, current.TargetX, current.TargetY);
 					};
 
 					if (current.MustNotBeCaptured)
@@ -212,9 +208,9 @@ namespace AdvanceEngine.Models
 						}
 					}
 
-					yield return new Move(0, 0, moveMutator, EMoveType.Move, self, current)
+					yield return new Move(0, 0, moveMutator, EMoveType.Move, this, current)
 					{
-						Origin = (x, y),
+						Origin = (X, Y),
 						TargetPiece = null,
 						TargetPosition = (current.TargetX, current.TargetY)
 					};
@@ -228,6 +224,7 @@ namespace AdvanceEngine.Models
 		/// <param name="mustBeEmpty">coordinates to check</param>
 		/// <param name="map">The piece map representing the board state</param>
 		/// <returns>True if the listed spaces are empty. False if the move is obstructed</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private bool CheckSpaces((int x, int y)[]? mustBeEmpty, IPieceMap map)
 		{
 			if (mustBeEmpty == null)

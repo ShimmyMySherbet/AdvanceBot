@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Reflection;
 using System.Text;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models;
@@ -40,7 +39,6 @@ namespace AdvanceGame.UI
 		public IAdvanceAI? BlackAI { get; set; }
 		public string WhiteAIName { get; set; } = string.Empty;
 		public string BlackAIName { get; set; } = string.Empty;
-
 
 		public int WhiteMoves { get; set; } = 0;
 		public int BlackMoves { get; set; } = 0;
@@ -153,6 +151,13 @@ namespace AdvanceGame.UI
 
 				Winner = winner;
 
+				if (cbAutoPlay.Checked)
+				{
+					Reset();
+					PromptForMove(ETeam.White);
+					return;
+				}
+
 				if (winner == ETeam.Neutral)
 				{
 					lblWinner.Text = $"Draw!";
@@ -201,7 +206,7 @@ namespace AdvanceGame.UI
 		{
 			if (team == ETeam.Black)
 			{
-				if (ovr || BlackAIEnabled && BlackAI != null)
+				if (BlackAI != null && (ovr || BlackAIEnabled))
 				{
 					lblBlackStatus.Text = "Status: Thinking...";
 
@@ -239,8 +244,16 @@ namespace AdvanceGame.UI
 								var enemy = team == ETeam.White ? ETeam.Black : ETeam.White;
 								lblWinner.Text = $"Winner: {enemy}";
 								Winner = enemy;
-								MessageBox.Show($"{enemy} Wins!");
 								lblBlackStatus.Text = $"Status: Moved (took {Math.Round(sw.ElapsedTicks / 10000f, 3)}ms)";
+
+								if (cbAutoPlay.Checked)
+								{
+									Reset();
+									PromptForMove(ETeam.White);
+									return;
+								}
+
+								MessageBox.Show($"{enemy} Wins!");
 
 							});
 						}
@@ -284,9 +297,17 @@ namespace AdvanceGame.UI
 							{
 								var enemy = team == ETeam.White ? ETeam.Black : ETeam.White;
 								lblWinner.Text = $"Winner: {enemy}";
-								MessageBox.Show($"{enemy} Wins!");
 								lblWhiteStatus.Text = $"Status: Moved (took {Math.Round(sw.ElapsedTicks / 10000f, 3)}ms)";
 								Winner = enemy;
+
+								if (cbAutoPlay.Checked)
+								{
+									Reset();
+									PromptForMove(ETeam.White);
+									return;
+								}
+
+								MessageBox.Show($"{enemy} Wins!");
 							});
 						}
 					});
@@ -370,6 +391,11 @@ namespace AdvanceGame.UI
 
 		private void btnReset_Click(object sender, EventArgs e)
 		{
+			Reset();
+		}
+
+		public void Reset()
+		{
 			m_History.Add((Map, CurrentTeam, BlackMoves, WhiteMoves));
 			Map = PieceMap.Default
 				.Mutate(Mutators.DefaultLayout);
@@ -379,6 +405,7 @@ namespace AdvanceGame.UI
 			lblWhiteMoves.Text = $"Moves: {WhiteMoves}";
 			lblBlackMoves.Text = $"Moves: {BlackMoves}";
 			lblTurn.Text = $"Current Turn: {CurrentTeam}";
+			lblWinner.Text = $"Previous Winner: {Winner}";
 			Render();
 		}
 
@@ -471,7 +498,6 @@ namespace AdvanceGame.UI
 			public List<_Save> Saves { get; set; } = new List<_Save>();
 			public string? BlackAI { get; set; }
 			public string? WhiteAI { get; set; }
-
 		}
 		private class _Save
 		{
@@ -546,11 +572,21 @@ namespace AdvanceGame.UI
 
 		private void btnDebug_Click(object sender, EventArgs e)
 		{
-			var blackState = Map.CheckState(ETeam.Black);
 			var whiteState = Map.CheckState(ETeam.White);
 
-			Debug.WriteLine($"Black: {blackState}");
 			Debug.WriteLine($"White: {whiteState}");
+		}
+
+		private void btnDebugBlack_Click(object sender, EventArgs e)
+		{
+			var blackState = Map.CheckState(ETeam.Black);
+
+			Debug.WriteLine($"Black: {blackState}");
+		}
+
+		private void checkBox1_CheckedChanged(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

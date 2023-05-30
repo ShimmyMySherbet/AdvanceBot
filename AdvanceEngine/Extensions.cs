@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using AdvanceEngine.Logic.Pieces;
 using AdvanceEngine.Models.Enums;
 using AdvanceEngine.Models.Interfaces;
@@ -17,15 +19,42 @@ namespace AdvanceEngine
 		/// <returns>The playing team's enemy</returns>
 		public static ETeam Enemy(this ETeam team)
 		{
-			if (team == ETeam.Black)
+			switch (team)
 			{
-				return ETeam.White;
+				case ETeam.Black:
+					return ETeam.White;
+				case ETeam.White:
+					return ETeam.Black;
+				default:
+					return ETeam.Neutral;
 			}
-			else if (team == ETeam.White)
+		}
+
+		/// <summary>
+		/// Returns an iterable collection of hostile pieces on the board
+		/// </summary>
+		/// <param name="map">The board state</param>
+		/// <param name="team">The playing team</param>
+		/// <returns>Iterable list of hostile pieces</returns>
+		public static IReadOnlyList<IPiece> EnemyPieces(this IPieceMap map, ETeam team) => FriendlyPieces(map, team.Enemy());
+
+		/// <summary>
+		/// Returns an iterable collection of firendly pieces on the board
+		/// </summary>
+		/// <param name="map">The board state</param>
+		/// <param name="team">The playing team</param>
+		/// <returns>Iterable list of friendly pieces</returns>
+		public static IReadOnlyList<IPiece> FriendlyPieces(this IPieceMap map, ETeam team)
+		{
+			switch (team)
 			{
-				return ETeam.Black;
+				case ETeam.White:
+					return map.WhitePieces;
+				case ETeam.Black:
+					return map.BlackPieces;
+				default:
+					return Array.Empty<IPiece>();
 			}
-			return ETeam.Neutral;
 		}
 
 		/// <summary>

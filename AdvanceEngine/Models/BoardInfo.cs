@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AdvanceEngine.Models.Interfaces;
 
 namespace AdvanceEngine.Models
 {
@@ -10,22 +11,22 @@ namespace AdvanceEngine.Models
 		/// <summary>
 		/// The current player's General
 		/// </summary>
-		public PieceInfo Self { get; }
+		public IPiece Self { get; }
 
 		/// <summary>
 		/// The opponent's General
 		/// </summary>
-		public PieceInfo Opponent { get; }
+		public IPiece Opponent { get; }
 
 		/// <summary>
 		/// Iterable collection of the player's own pieces
 		/// </summary>
-		public IReadOnlyCollection<PieceInfo> Friendly { get; }
+		public IReadOnlyList<IPiece> Friendly { get; }
 
 		/// <summary>
 		/// Iterable collection of the opponent's pieces
 		/// </summary>
-		public IReadOnlyCollection<PieceInfo> Hostile { get; }
+		public IReadOnlyList<IPiece> Hostile { get; }
 
 		/// <summary>
 		/// Board Info
@@ -34,7 +35,7 @@ namespace AdvanceEngine.Models
 		/// <param name="opponent">The enemy's general</param>
 		/// <param name="friendly">Friendly pieces</param>
 		/// <param name="hostile">Hostile pieces</param>
-		public BoardInfo(PieceInfo self, PieceInfo opponent, IReadOnlyCollection<PieceInfo> friendly, IReadOnlyCollection<PieceInfo> hostile)
+		public BoardInfo(IPiece self, IPiece opponent, IReadOnlyList<IPiece> friendly, IReadOnlyList<IPiece> hostile)
 		{
 			Self = self;
 			Opponent = opponent;

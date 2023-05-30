@@ -15,26 +15,28 @@ namespace AdvanceEngine.Logic.Pieces
 		/// <summary>
 		/// Wall Constructor
 		/// </summary>
-		public Wall() : base(ETeam.Neutral) { }
+		/// <param name="x">X Coordinate</param>
+		/// <param name="y">Y Coordinate</param>
+		public Wall(int x, int y) : base(ETeam.Neutral, x, y) { }
 
 		/// <summary>
-		/// Does nothing, as the wall cannot belong to a playing team
+		/// <summary>
+		/// Converts the piece to another team
 		/// </summary>
-		/// <param name="team">Not Used</param>
-		/// <returns>Reference to self</returns>
-		public override IPiece Convert(ETeam team)
-		{
-			return this;
-		}
+		/// <param name="team">Team to convert to</param>
+		/// <param name="x">New X Coordinate</param>
+		/// <param name="y">New Y Coordinate</param>
+		/// <returns>A new instance of the piece in the desired team</returns>
+		public override IPiece Mutate(ETeam _, int x, int y) => new Wall(x, y);
 
 		/// <summary>
 		/// Yields nothing, as the wall cannot move
 		/// </summary>
 		/// <param name="x">Not used</param>
 		/// <param name="y">Not used</param>
-		/// <param name="dir">Not used</param>
+		/// <param name="team">Not Used</param>
 		/// <returns>Nil</returns>
-		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, int dir)
+		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, ETeam team)
 		{
 			yield break;
 		}

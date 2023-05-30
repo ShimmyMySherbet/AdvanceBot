@@ -16,23 +16,27 @@ namespace AdvanceEngine.Logic.Pieces
 		/// Builder
 		/// </summary>
 		/// <param name="team">Side</param>
-		public Builder(ETeam team) : base(team) { }
+		/// <param name="x">X Coordinate</param>
+		/// <param name="y">Y Coordinate</param>
+		public Builder(ETeam team, int x, int y) : base(team, x, y) { }
 
 		/// <summary>
 		/// Converts the piece to another team
 		/// </summary>
 		/// <param name="team">Team to convert to</param>
+		/// <param name="x">New X Coordinate</param>
+		/// <param name="y">New Y Coordinate</param>
 		/// <returns>A new instance of the piece in the desired team</returns>
-		public override IPiece Convert(ETeam team) => new Builder(team);
+		public override IPiece Mutate(ETeam team, int x, int y) => new Builder(team, x, y);
 
 		/// <summary>
 		/// Defines potential moves for this piece
 		/// </summary>
 		/// <param name="x">Piece X coordinate</param>
 		/// <param name="y">Piece Y coordinate</param>
-		/// <param name="dir">Direction multiplier. 1 when White, and -1 when Black</param>
+		/// <param name="team">The team of the playing team</param>
 		/// <returns>An enumeration of potential moves</returns>
-		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, int dir)
+		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, ETeam team)
 		{
 			for (int offsetX = -1; offsetX < 2; offsetX++)
 			{

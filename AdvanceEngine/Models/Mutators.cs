@@ -11,50 +11,49 @@ namespace AdvanceEngine.Models
 	/// </summary>
 	public static class Mutators
 	{
-
 		/// <summary>
 		/// Board mutator to add initial pieces
 		/// </summary>
 		/// <param name="map">The board to mutate</param>
 		public static void DefaultLayout(IPiece?[,] map)
 		{
-			map[0, 0] = new Miner(ETeam.Black);
-			map[1, 0] = new Jester(ETeam.Black);
-			map[2, 0] = new Dragon(ETeam.Black);
-			map[3, 0] = new Sentinel(ETeam.Black);
-			map[4, 0] = new General(ETeam.Black);
-			map[5, 0] = new Sentinel(ETeam.Black);
-			map[6, 0] = new Catapult(ETeam.Black);
-			map[7, 0] = new Jester(ETeam.Black);
-			map[8, 0] = new Miner(ETeam.Black);
+			map[0, 0] = new Miner(ETeam.Black, 0, 0);
+			map[1, 0] = new Jester(ETeam.Black, 1, 0);
+			map[2, 0] = new Dragon(ETeam.Black, 2, 0);
+			map[3, 0] = new Sentinel(ETeam.Black, 3, 0);
+			map[4, 0] = new General(ETeam.Black, 4, 0);
+			map[5, 0] = new Sentinel(ETeam.Black, 5, 0);
+			map[6, 0] = new Catapult(ETeam.Black, 6, 0);
+			map[7, 0] = new Jester(ETeam.Black, 7, 0);
+			map[8, 0] = new Miner(ETeam.Black, 8, 0);
 
-			map[0, 1] = new Builder(ETeam.Black);
+			map[0, 1] = new Builder(ETeam.Black, 0, 1);
 			for (int x = 1; x < 8; x++)
 			{
-				map[x, 1] = new Zombie(ETeam.Black);
+				map[x, 1] = new Zombie(ETeam.Black, x, 1);
 			}
-			map[8, 1] = new Builder(ETeam.Black);
+			map[8, 1] = new Builder(ETeam.Black, 8, 1);
 
-			map[0, 7] = new Builder(ETeam.White);
+			map[0, 7] = new Builder(ETeam.White, 0, 7);
 			for (int x = 1; x < 8; x++)
 			{
-				map[x, 7] = new Zombie(ETeam.White);
+				map[x, 7] = new Zombie(ETeam.White, x, 7);
 			}
-			map[8, 7] = new Builder(ETeam.White);
+			map[8, 7] = new Builder(ETeam.White, 8, 7);
 
-			map[0, 8] = new Miner(ETeam.White);
-			map[1, 8] = new Jester(ETeam.White);
+			map[0, 8] = new Miner(ETeam.White, 0, 8);
+			map[1, 8] = new Jester(ETeam.White, 1, 8);
 
-			map[2, 8] = new Catapult(ETeam.White);
+			map[2, 8] = new Catapult(ETeam.White, 2, 8);
 
-			map[3, 8] = new Sentinel(ETeam.White);
-			map[4, 8] = new General(ETeam.White);
-			map[5, 8] = new Sentinel(ETeam.White);
+			map[3, 8] = new Sentinel(ETeam.White, 3, 8);
+			map[4, 8] = new General(ETeam.White, 4, 8);
+			map[5, 8] = new Sentinel(ETeam.White, 5, 8);
 
-			map[6, 8] = new Dragon(ETeam.White);
+			map[6, 8] = new Dragon(ETeam.White, 6, 8);
 
-			map[7, 8] = new Jester(ETeam.White);
-			map[8, 8] = new Miner(ETeam.White);
+			map[7, 8] = new Jester(ETeam.White, 7, 8);
+			map[8, 8] = new Miner(ETeam.White, 8, 8);
 
 		}
 
@@ -96,7 +95,7 @@ namespace AdvanceEngine.Models
 				{
 					for (int y = 0; y < 9; y++)
 					{
-						map[x, y] = ConvertToPiece(data[y][x]);
+						map[x, y] = ConvertToPiece(data[y][x], x ,y);
 					}
 				}
 			};
@@ -133,12 +132,12 @@ namespace AdvanceEngine.Models
 		/// <param name="x">Target X Coordinate</param>
 		/// <param name="y">Target Y Coordinate</param>
 		/// <returns>A mutator to apply to a board</returns>
-		public static MapMutator MovePiece(PieceInfo info, int x, int y)
+		public static MapMutator MovePiece(IPiece piece, int x, int y)
 		{
 			return (IPiece?[,] map) =>
 			{
-				map[info.X, info.Y] = null;
-				map[x, y] = info.Piece;
+				map[piece.X, piece.Y] = null;
+				map[x, y] = piece.Mutate(piece.Team, x, y);
 			};
 		}
 
@@ -148,22 +147,22 @@ namespace AdvanceEngine.Models
 		/// <param name="pieceChar">Char representation</param>
 		/// <returns>A new instance of the specified piece</returns>
 		/// <exception cref="UnknownPieceException">Raised when an unknown/unexpected character is provided</exception>
-		private static IPiece? ConvertToPiece(char pieceChar)
+		private static IPiece? ConvertToPiece(char pieceChar, int x, int y)
 		{
 			var team = char.IsUpper(pieceChar) ? ETeam.White : ETeam.Black;
 
 			switch (char.ToLower(pieceChar))
 			{
 				case '.': return null;
-				case '#': return new Wall();
-				case 'm': return new Miner(team);
-				case 'j': return new Jester(team);
-				case 'd': return new Dragon(team);
-				case 's': return new Sentinel(team);
-				case 'g': return new General(team);
-				case 'c': return new Catapult(team);
-				case 'b': return new Builder(team);
-				case 'z': return new Zombie(team);
+				case '#': return new Wall(x, y);
+				case 'm': return new Miner(team, x, y);
+				case 'j': return new Jester(team, x, y);
+				case 'd': return new Dragon(team, x , y);
+				case 's': return new Sentinel(team, x, y);
+				case 'g': return new General(team, x, y);
+				case 'c': return new Catapult(team, x, y);
+				case 'b': return new Builder(team, x, y);
+				case 'z': return new Zombie(team, x, y);
 			}
 
 			throw new UnknownPieceException(pieceChar);

@@ -16,23 +16,27 @@ namespace AdvanceEngine.Logic.Pieces
 		/// Catapult
 		/// </summary>
 		/// <param name="team">Initial Side</param>
-		public Catapult(ETeam team) : base(team) { }
+		/// <param name="x">X Coordinate</param>
+		/// <param name="y">Y Coordinate</param>
+		public Catapult(ETeam team, int x, int y) : base(team, x, y) { }
 
 		/// <summary>
 		/// Converts the piece to another team
 		/// </summary>
 		/// <param name="team">Team to convert to</param>
-		/// <returns>New instance of the piece in the specified team</returns>
-		public override IPiece Convert(ETeam team) => new Catapult(team);
+		/// <param name="x">New X Coordinate</param>
+		/// <param name="y">New Y Coordinate</param>
+		/// <returns>A new instance of the piece in the desired team</returns>
+		public override IPiece Mutate(ETeam team, int x, int y) => new Catapult(team, x, y);
 
 		/// <summary>
 		/// Defines potential moves for this piece
 		/// </summary>
 		/// <param name="x">Piece X coordinate</param>
 		/// <param name="y">Piece Y coordinate</param>
-		/// <param name="dir">Direction multiplier. 1 when White, and -1 when Black</param>
+		/// <param name="team">The team of the playing team</param>
 		/// <returns>An enumeration of potential moves</returns>
-		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, int dir)
+		public override IEnumerator<PotentialMove> GetMoveDefinitions(int x, int y, ETeam team)
 		{
 			yield return new PotentialMove(x, y - 1, canAttack: false);
 			yield return new PotentialMove(x, y + 1, canAttack: false);
