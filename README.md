@@ -34,3 +34,5 @@ A game/logic engine, and AI engine for the game 'Advance'. Developed as a uni as
 
 ### Downloads
 If you want to mess around with this project, you can compile it yourself, or download the latest release [here](https://github.com/ShimmyMySherbet/AdvanceBot/releases)
+
+If you want to compile this yourself, you will still need the assets folder, provded under releases.
